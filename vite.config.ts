@@ -27,7 +27,7 @@ export default defineConfig(({ mode }) => ({
       forceBuildInstrument: true, //Instrument the source code for cypress runs
     }),
   ],
-  base: mode === "desktop" ? "/" : "/maputnik/",
+  base: "/",
   define: {
     global: "window"
   },
