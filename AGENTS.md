@@ -1,3 +1,10 @@
+
+## Primary Directive
+
+- Think in English, interact with the user in Japanese.
+
+## Maputnik
+
 Maputnik is a MapLibre style editor written using React and TypeScript.
 
 To get started, install all npm packages:
