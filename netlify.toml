@@ -1,5 +1,5 @@
 [build]
-  command = "sed -i 's/get_your_own_OpIi9ZULNHzrESv6T2vL/'$MAPTILER_KEY'/g' src/config/styles.json && npm run build"
+  command = "sed -i \"s/get_your_own_OpIi9ZULNHzrESv6T2vL/$MAPTILER_KEY/g\" src/config/*.json && npm run build"
   publish = "dist"
 
 [[redirects]]
