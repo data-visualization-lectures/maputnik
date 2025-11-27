@@ -1,7 +1,7 @@
-import {derefLayers} from "@maplibre/maplibre-gl-style-spec";
-import type {StyleSpecification, LayerSpecification} from "maplibre-gl";
-import tokens from "../config/tokens.json";
-import type {StyleSpecificationWithId} from "./definitions";
+import { derefLayers } from "@maplibre/maplibre-gl-style-spec";
+import type { StyleSpecification, LayerSpecification } from "maplibre-gl";
+import { tokens } from "../config/tokens";
+import type { StyleSpecificationWithId } from "./definitions";
 
 // Empty style is always used if no style could be restored or fetched
 const emptyStyle = ensureStyleValidity({
@@ -15,7 +15,7 @@ function generateId() {
 }
 
 function ensureHasId(style: StyleSpecification & { id?: string }): StyleSpecificationWithId {
-  if(!("id" in style) || !style.id) {
+  if (!("id" in style) || !style.id) {
     style.id = generateId();
   }
   return style as StyleSpecificationWithId;
@@ -47,31 +47,31 @@ function ensureStyleValidity(style: StyleSpecification): StyleSpecificationWithI
 
 function indexOfLayer(layers: LayerSpecification[], layerId: string) {
   for (let i = 0; i < layers.length; i++) {
-    if(layers[i].id === layerId) {
+    if (layers[i].id === layerId) {
       return i;
     }
   }
   return null;
 }
 
-function getAccessToken(sourceName: string, mapStyle: StyleSpecification, opts: {allowFallback?: boolean}) {
+function getAccessToken(sourceName: string, mapStyle: StyleSpecification, opts: { allowFallback?: boolean }) {
   const metadata = mapStyle.metadata || {} as any;
   let accessToken = metadata[`maputnik:${sourceName}_access_token`];
 
-  if(opts.allowFallback && !accessToken) {
+  if (opts.allowFallback && !accessToken) {
     accessToken = tokens[sourceName as keyof typeof tokens];
   }
 
   return accessToken;
 }
 
-function replaceSourceAccessToken(mapStyle: StyleSpecification, sourceName: string, opts={}) {
+function replaceSourceAccessToken(mapStyle: StyleSpecification, sourceName: string, opts = {}) {
   const source = mapStyle.sources[sourceName];
-  if(!source) return mapStyle;
-  if(!("url" in source) || !source.url) return mapStyle;
+  if (!source) return mapStyle;
+  if (!("url" in source) || !source.url) return mapStyle;
 
   let authSourceName = sourceName;
-  if(sourceName === "thunderforest_transport" || sourceName === "thunderforest_outdoors") {
+  if (sourceName === "thunderforest_transport" || sourceName === "thunderforest_outdoors") {
     authSourceName = "thunderforest";
   }
   else if (("url" in source) && source.url?.match(/\.stadiamaps\.com/)) {
@@ -85,7 +85,7 @@ function replaceSourceAccessToken(mapStyle: StyleSpecification, sourceName: stri
 
   const accessToken = getAccessToken(authSourceName, mapStyle, opts);
 
-  if(!accessToken) {
+  if (!accessToken) {
     // Early exit.
     return mapStyle;
   }
@@ -114,7 +114,7 @@ function replaceSourceAccessToken(mapStyle: StyleSpecification, sourceName: stri
   return changedStyle;
 }
 
-function replaceAccessTokens(mapStyle: StyleSpecification, opts={}) {
+function replaceAccessTokens(mapStyle: StyleSpecification, opts = {}) {
   let changedStyle = mapStyle;
 
   Object.keys(mapStyle.sources).forEach((sourceName) => {

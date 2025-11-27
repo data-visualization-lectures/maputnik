@@ -1,7 +1,7 @@
 import style from "../style";
-import {loadStyleUrl} from "../urlopen";
-import publicSources from "../../config/styles.json";
-import type {IStyleStore, StyleSpecificationWithId} from "../definitions";
+import { loadStyleUrl } from "../urlopen";
+import { styles as publicSources } from "../../config/styles";
+import type { IStyleStore, StyleSpecificationWithId } from "../definitions";
 
 const storagePrefix = "maputnik";
 const stylePrefix = "style";
@@ -22,7 +22,7 @@ function loadStoredStyles() {
   const styles = [];
   for (let i = 0; i < window.localStorage.length; i++) {
     const key = window.localStorage.key(i);
-    if(isStyleKey(key!)) {
+    if (isStyleKey(key!)) {
       styles.push(fromKey(key!));
     }
   }
@@ -36,7 +36,7 @@ function isStyleKey(key: string) {
 
 // Load style id from key
 function fromKey(key: string) {
-  if(!isStyleKey(key)) {
+  if (!isStyleKey(key)) {
     throw "Key is not a valid style key";
   }
 
@@ -67,7 +67,7 @@ export class StyleStore implements IStyleStore {
   purge() {
     for (let i = 0; i < window.localStorage.length; i++) {
       const key = window.localStorage.key(i) as string;
-      if(key.startsWith(storagePrefix)) {
+      if (key.startsWith(storagePrefix)) {
         window.localStorage.removeItem(key);
       }
     }
@@ -75,7 +75,7 @@ export class StyleStore implements IStyleStore {
 
   // Find the last edited style
   async getLatestStyle(): Promise<StyleSpecificationWithId> {
-    if(this.mapStyles.length === 0) {
+    if (this.mapStyles.length === 0) {
       return loadDefaultStyle();
     }
     const styleId = window.localStorage.getItem(storageKeys.latest) as string;
