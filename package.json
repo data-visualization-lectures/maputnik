@@ -16,7 +16,7 @@
     "test-unit-ci": "vitest run --coverage --reporter=json",
     "cy:open": "cypress open",
     "lint-css": "stylelint \"src/styles/*.scss\"",
-    "sort-styles": "jq 'sort_by(.id)' src/config/styles.json > tmp.json && mv tmp.json src/config/styles.json"
+
   },
   "repository": {
     "type": "git",
