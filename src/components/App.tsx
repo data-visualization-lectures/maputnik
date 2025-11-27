@@ -50,7 +50,7 @@ function setFetchAccessToken(url: string, mapStyle: StyleSpecification) {
   if (matchesTilehosting || matchesMaptiler) {
     const accessToken = style.getAccessToken("openmaptiles", mapStyle, { allowFallback: true });
     if (accessToken) {
-      return url.replace("{key}", accessToken);
+      return url.replace("{key}", accessToken).replace("get_your_own_OpIi9ZULNHzrESv6T2vL", accessToken);
     }
   }
   else if (matchesThunderforest) {
