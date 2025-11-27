@@ -6,6 +6,7 @@
   "main": "''",
   "scripts": {
     "start": "vite",
+    "prebuild": "node scripts/create-env.js",
     "build": "vite build --mode=production",
     "build-desktop": "tsc && vite build --mode=desktop && cd desktop && make",
     "build-linux": "tsc && vite build --mode=desktop && cd desktop && make bin/linux/maputnik",
