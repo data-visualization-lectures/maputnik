@@ -1,5 +1,5 @@
 [build]
-  command = "npm run build"
+  command = "VITE_MAPTILER_KEY=$MAPTILER_KEY npm run build"
   publish = "dist"
 
 [[redirects]]
