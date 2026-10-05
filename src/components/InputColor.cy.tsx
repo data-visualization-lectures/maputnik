@@ -61,7 +61,7 @@ describe("<InputColor />", () => {
     cy.get(".maputnik-color-swatch")
       .should("have.css", "background-color", "rgb(0, 255, 0)");
 
-    cy.get(".maputnik-color").clear().type("not-a-color");
+    cy.get(".maputnik-color").clear().should("have.value", "").type("not-a-color");
 
     cy.get(".maputnik-color-error")
       .should("be.visible")
@@ -76,9 +76,9 @@ describe("<InputColor />", () => {
   it("clears the validation message when the color becomes valid again", () => {
     mount(<ControlledColor initial="#112233" />);
 
-    cy.get(".maputnik-color").clear().type("nope");
+    cy.get(".maputnik-color").clear().should("have.value", "").type("nope");
     cy.get(".maputnik-color-error").should("be.visible");
-    cy.get(".maputnik-color").clear().type("#ff0000");
+    cy.get(".maputnik-color").clear().should("have.value", "").type("#ff0000");
     cy.get(".maputnik-color-error").should("not.exist");
     cy.get(".maputnik-color").should("have.attr", "aria-invalid", "false");
     cy.get(".maputnik-color-swatch")

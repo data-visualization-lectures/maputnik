@@ -137,19 +137,22 @@ const InputColor: React.FC<InputColorProps> = (props) => {
     }
   }, []);
 
-  const openPicker = useCallback((trigger: HTMLElement, instant = false) => {
+  const focusPickerOnOpenRef = useRef(false);
+
+  const openPicker = useCallback((trigger: HTMLElement, options?: {instant?: boolean, focusPicker?: boolean}) => {
     triggerRef.current = trigger;
-    setInstantMotion(instant);
+    setInstantMotion(Boolean(options?.instant));
+    focusPickerOnOpenRef.current = Boolean(options?.focusPicker);
     setPlacement(calcPickerPlacement(wrapperRef.current));
     setPickerOpened(true);
   }, []);
 
-  const togglePicker = useCallback((trigger: HTMLElement, instant = false) => {
+  const togglePicker = useCallback((trigger: HTMLElement, options?: {instant?: boolean, focusPicker?: boolean}) => {
     if (pickerOpened) {
-      closePicker({restoreFocus: true, instant});
+      closePicker({restoreFocus: true, instant: options?.instant});
     }
     else {
-      openPicker(trigger, instant);
+      openPicker(trigger, options);
     }
   }, [closePicker, openPicker, pickerOpened]);
 
@@ -166,7 +169,9 @@ const InputColor: React.FC<InputColorProps> = (props) => {
 
     const frame = window.requestAnimationFrame(() => {
       setPickerEntered(true);
-      pickerRef.current?.focus();
+      if (focusPickerOnOpenRef.current) {
+        pickerRef.current?.focus();
+      }
     });
 
     window.addEventListener("resize", updatePlacement);
@@ -262,7 +267,10 @@ const InputColor: React.FC<InputColorProps> = (props) => {
       data-wd-key={props["data-wd-key"] ? `${props["data-wd-key"]}.swatch` : "color-swatch"}
       onClick={(event) => {
         event.preventDefault();
-        togglePicker(event.currentTarget, isKeyboardClick(event));
+        togglePicker(event.currentTarget, {
+          instant: isKeyboardClick(event),
+          focusPicker: true,
+        });
       }}
     />
     <input
@@ -277,7 +285,9 @@ const InputColor: React.FC<InputColorProps> = (props) => {
       })}
       data-wd-key={props["data-wd-key"]}
       onClick={(event) => {
-        togglePicker(event.currentTarget, isKeyboardClick(event));
+        if (!pickerOpened) {
+          openPicker(event.currentTarget, {instant: isKeyboardClick(event), focusPicker: false});
+        }
       }}
       style={props.style}
       name={props.name}
