@@ -4,13 +4,17 @@ import lodash from "lodash";
 import {
   DndContext,
   PointerSensor,
+  KeyboardSensor,
   useSensor,
   useSensors,
   closestCenter,
+  type Announcements,
   type DragEndEvent,
+  type UniqueIdentifier,
 } from "@dnd-kit/core";
 import {
   SortableContext,
+  sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 
@@ -20,8 +24,8 @@ import ModalAdd from "./modals/ModalAdd";
 
 import type {LayerSpecification, SourceSpecification} from "maplibre-gl";
 import generateUniqueId from "../libs/document-uid";
-import { findClosestCommonPrefix, layerPrefix } from "../libs/layer";
-import { type WithTranslation, withTranslation } from "react-i18next";
+import { findClosestCommonPrefix, layerPrefix, layerIdFromSortableId, layerIndexFromSortableId, uniqueLayerListId, uniqueLayerListIds } from "../libs/layer";
+import { type WithTranslation, withTranslation, useTranslation } from "react-i18next";
 import { type MappedError, type OnMoveLayerCallback } from "../libs/definitions";
 
 type LayerListContainerProps = {
@@ -118,7 +122,7 @@ class LayerListContainerInternal extends React.Component<LayerListContainerInter
       );
       const layer = {
         ...origLayer,
-        key: `layers-list-${origLayer.id}-${layerIdCount.get(origLayer.id)}`,
+        key: uniqueLayerListId(origLayer.id, layerIdCount.get(origLayer.id)),
       };
       if(previousLayer && layerPrefix(previousLayer.id) == layerPrefix(layer.id)) {
         const lastGroup = groups[groups.length - 1];
@@ -256,6 +260,7 @@ class LayerListContainerInternal extends React.Component<LayerListContainerInter
           })}
           key={layer.key}
           id={layer.key}
+          sortableId={layer.key}
           layerId={layer.id}
           layerIndex={idx}
           layerType={layer.type}
@@ -337,25 +342,72 @@ type LayerListProps = LayerListContainerProps & {
 };
 
 const LayerList: React.FC<LayerListProps> = (props) => {
-  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
+  const {t} = useTranslation();
+  const layersRef = React.useRef(props.layers);
+  layersRef.current = props.layers;
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
+
+  const sortableIds = uniqueLayerListIds(props.layers);
+
+  const getLayerId = (sortableId: UniqueIdentifier) =>
+    layerIdFromSortableId(layersRef.current, sortableId);
+
+  const announcements: Announcements = {
+    onDragStart({active}) {
+      return t("Picked up layer {{id}}.", {id: getLayerId(active.id)});
+    },
+    onDragOver({active, over}) {
+      if (over) {
+        return t("Layer {{id}} was moved over layer {{overId}}.", {
+          id: getLayerId(active.id),
+          overId: getLayerId(over.id),
+        });
+      }
+      return t("Layer {{id}} is no longer over a droppable area.", {id: getLayerId(active.id)});
+    },
+    onDragEnd({active, over}) {
+      if (over) {
+        return t("Layer {{id}} was dropped over layer {{overId}}.", {
+          id: getLayerId(active.id),
+          overId: getLayerId(over.id),
+        });
+      }
+      return t("Layer {{id}} was dropped.", {id: getLayerId(active.id)});
+    },
+    onDragCancel({active}) {
+      return t("Dragging was cancelled. Layer {{id}} was dropped.", {id: getLayerId(active.id)});
+    },
+  };
 
   const handleDragEnd = (event: DragEndEvent) => {
     const {active, over} = event;
     if (!over) return;
 
-    const oldIndex = props.layers.findIndex(layer => layer.id === active.id);
-    const newIndex = props.layers.findIndex(layer => layer.id === over.id);
+    const oldIndex = layerIndexFromSortableId(props.layers, active.id);
+    const newIndex = layerIndexFromSortableId(props.layers, over.id);
 
     if (oldIndex !== -1 && newIndex !== -1 && oldIndex !== newIndex) {
       props.onMoveLayer({oldIndex, newIndex});
     }
   };
 
-  const layerIds = props.layers.map(layer => layer.id);
-
   return (
-    <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-      <SortableContext items={layerIds} strategy={verticalListSortingStrategy}>
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCenter}
+      onDragEnd={handleDragEnd}
+      accessibility={{
+        announcements,
+        screenReaderInstructions: {
+          draggable: t("To pick up a layer, press the space bar. While dragging, use the arrow keys to move the layer. Press space again to drop the layer in its new position, or press Escape to cancel."),
+        },
+      }}
+    >
+      <SortableContext items={sortableIds} strategy={verticalListSortingStrategy}>
         <LayerListContainer {...props} />
       </SortableContext>
     </DndContext>

@@ -12,6 +12,7 @@
 - Upgraded codemirror from version 5 to version 6
 - Add code editor to allow editing the entire style
 - Add support for sprite object in setting modal
+- Allow keyboard reordering of layers in the layer list and use unique sortable IDs so duplicate layer IDs do not break drag-and-drop
 - _...Add new stuff here..._
 
 ### 🐞 Bug fixes

@@ -21,6 +21,14 @@ export default class MaputnikCypressHelper {
       this.helper.when.wait(1);
       this.helper.get.elementByTestId(targetElement).realMouseUp();
     },
+    reorderLayerWithKeyboard: (handleTestId: string, arrowPresses: number) => {
+      this.helper.get.elementByTestId(handleTestId).focus();
+      cy.realPress("Space");
+      for (let i = 0; i < arrowPresses; i++) {
+        cy.realPress("ArrowDown");
+      }
+      cy.realPress("Space");
+    },
     clickCenter: (element: string) => {
       this.helper.get.elementByTestId(element).realMouseDown({ button: "left", position: "center" });
       this.helper.when.wait(200);

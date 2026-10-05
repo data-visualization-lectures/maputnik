@@ -6,18 +6,27 @@ import {useSortable} from "@dnd-kit/sortable";
 import {CSS} from "@dnd-kit/utilities";
 
 import IconLayer from "./IconLayer";
+import { useTranslation } from "react-i18next";
 
 
 type DraggableLabelProps = {
   layerId: string
+  layerIndex: number
   layerType: string
   dragAttributes?: React.HTMLAttributes<HTMLElement>
   dragListeners?: React.HTMLAttributes<HTMLElement>
 };
 
 const DraggableLabel: React.FC<DraggableLabelProps> = (props) => {
+  const {t} = useTranslation();
   const {dragAttributes, dragListeners} = props;
-  return <div className="maputnik-layer-list-item-handle" {...dragAttributes} {...dragListeners}>
+  return <div
+    className="maputnik-layer-list-item-handle"
+    {...dragAttributes}
+    {...dragListeners}
+    data-wd-key={"layer-list-item-handle:" + props.layerIndex}
+    aria-label={t("Reorder layer {{id}}", {id: props.layerId})}
+  >
     <IconLayer
       className="layer-handle__icon"
       type={props.layerType}
@@ -74,6 +83,7 @@ class IconAction extends React.Component<IconActionProps> {
 
 type LayerListItemProps = {
   id?: string
+  sortableId: string
   layerIndex: number
   layerId: string
   layerType: string
@@ -102,7 +112,7 @@ const LayerListItem = React.forwardRef<HTMLLIElement, LayerListItemProps>((props
     transform,
     transition,
     isDragging,
-  } = useSortable({id: props.layerId});
+  } = useSortable({id: props.sortableId});
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -134,6 +144,7 @@ const LayerListItem = React.forwardRef<HTMLLIElement, LayerListItemProps>((props
       })}>
       <DraggableLabel
         layerId={props.layerId}
+        layerIndex={props.layerIndex}
         layerType={props.layerType}
         dragAttributes={attributes}
         dragListeners={listeners}
