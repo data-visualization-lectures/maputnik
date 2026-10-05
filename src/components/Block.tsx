@@ -43,10 +43,11 @@ export default class Block extends React.Component<BlockProps, BlockState> {
   };
 
   /**
-   * Some fields for example <InputColor/> bind click events inside the element
-   * to close the picker. This in turn propagates to the <label/> element
-   * causing the picker to reopen. This causes a scenario where the picker can
-   * never be closed once open.
+   * Block is a wrapping <label>. Nested controls (color swatch, range sliders,
+   * doc links) would otherwise activate the first labelable descendant.
+   * preventDefault stops that. The color picker overlay that used to reopen
+   * the picker is gone, but this guard remains necessary while Block is a
+   * <label>. Removing it would steal focus from those nested controls.
    */
   onLabelClick = (event: SyntheticEvent<any, any>) => {
     const el = event.nativeEvent.target;

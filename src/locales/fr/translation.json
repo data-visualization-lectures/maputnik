@@ -206,5 +206,9 @@
   "LocationIQ Access Token": "Jeton d'accès LocationIQ",
   "Public access token for LocationIQ services.": "Jeton d'accès public pour les services LocationIQ.",
   "Style Renderer": "Moteur de rendu pour le style",
-  "Choose the default Maputnik renderer for this style.": "Choisissez le moteur de rendu Maputnik par défaut pour ce style."
+  "Choose the default Maputnik renderer for this style.": "Choisissez le moteur de rendu Maputnik par défaut pour ce style.",
+  "Open color picker": "Ouvrir le sélecteur de couleur",
+  "Close color picker": "Fermer le sélecteur de couleur",
+  "Color picker": "Sélecteur de couleur",
+  "Invalid color": "Couleur invalide"
 }

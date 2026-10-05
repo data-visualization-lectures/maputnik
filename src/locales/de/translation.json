@@ -214,5 +214,9 @@
   "Width": "Breite",
   "Height": "Höhe",
   "Field": "Feld",
-  "Size": "Größe"
+  "Size": "Größe",
+  "Open color picker": "Farbwähler öffnen",
+  "Close color picker": "Farbwähler schließen",
+  "Color picker": "Farbwähler",
+  "Invalid color": "Ungültige Farbe"
 }

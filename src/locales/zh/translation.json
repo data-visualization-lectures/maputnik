@@ -206,5 +206,9 @@
   "LocationIQ Access Token": "LocationIQ 访问令牌",
   "Public access token for LocationIQ services.": "LocationIQ 服务的公共访问令牌。",
   "Style Renderer": "样式渲染器",
-  "Choose the default Maputnik renderer for this style.": "为这种样式选择默认的Maputnik渲染器。"
+  "Choose the default Maputnik renderer for this style.": "为这种样式选择默认的Maputnik渲染器。",
+  "Open color picker": "打开颜色选择器",
+  "Close color picker": "关闭颜色选择器",
+  "Color picker": "颜色选择器",
+  "Invalid color": "无效的颜色"
 }

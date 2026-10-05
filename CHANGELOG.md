@@ -12,6 +12,7 @@
 - Upgraded codemirror from version 5 to version 6
 - Add code editor to allow editing the entire style
 - Add support for sprite object in setting modal
+- Improve color picker UX: inline validation with last valid swatch, accessible swatch button, and Escape/outside-click dismiss
 - _...Add new stuff here..._
 
 ### 🐞 Bug fixes

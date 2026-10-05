@@ -206,5 +206,9 @@
   "LocationIQ Access Token": "Token di accesso LocationIQ",
   "Public access token for LocationIQ services.": "Token di accesso pubblico per i servizi LocationIQ.",
   "Style Renderer": "Renderer dello stile",
-  "Choose the default Maputnik renderer for this style.": "Scegli il renderer predefinito di Maputnik per questo stile."
+  "Choose the default Maputnik renderer for this style.": "Scegli il renderer predefinito di Maputnik per questo stile.",
+  "Open color picker": "Apri selettore colore",
+  "Close color picker": "Chiudi selettore colore",
+  "Color picker": "Selettore colore",
+  "Invalid color": "Colore non valido"
 }

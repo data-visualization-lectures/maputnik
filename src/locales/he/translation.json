@@ -206,5 +206,9 @@
   "LocationIQ Access Token": "LocationIQ Access Token",
   "Public access token for LocationIQ services.": "Public access token for LocationIQ services.",
   "Style Renderer": "צייר הסטייל",
-  "Choose the default Maputnik renderer for this style.": "בחירת צייר ברירת המחדל של מפוטניק עבור הסטייל הזה"
+  "Choose the default Maputnik renderer for this style.": "בחירת צייר ברירת המחדל של מפוטניק עבור הסטייל הזה",
+  "Open color picker": "פתח בוחר צבע",
+  "Close color picker": "סגור בוחר צבע",
+  "Color picker": "בוחר צבע",
+  "Invalid color": "צבע לא חוקי"
 }

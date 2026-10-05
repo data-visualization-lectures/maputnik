@@ -167,10 +167,10 @@ describe("layer editor", () => {
     beforeEach(() => {
       bgId = createBackground();
       when.click("layer-list-item:background:" + bgId);
-      when.click("spec-field:background-color");
     });
 
     it("should update style in local storage", () => {
+      when.click("spec-field:background-color");
       then(get.styleFromLocalStorage()).shouldDeepNestedInclude({
         layers: [
           {
@@ -179,6 +179,23 @@ describe("layer editor", () => {
           },
         ],
       });
+    });
+
+    it("should keep the last valid swatch and show inline validation", () => {
+      when.setValue("spec-field-input:background-color", "not-a-color");
+      then(get.elementByTestId("color-error")).shouldBeVisible();
+      then(get.element(".maputnik-color-swatch")).shouldHaveCss(
+        "background-color",
+        "rgb(0, 0, 0)"
+      );
+    });
+
+    it("should close the picker on Escape and return focus to the swatch", () => {
+      when.click("spec-field-input:background-color.swatch");
+      then(get.element(".chrome-picker")).shouldBeVisible();
+      get.element("[role=dialog]").type("{esc}");
+      then(get.element(".chrome-picker")).shouldNotExist();
+      then(get.elementByTestId("spec-field-input:background-color.swatch")).shouldBeFocused();
     });
   });
 

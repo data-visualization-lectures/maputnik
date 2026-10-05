@@ -206,5 +206,9 @@
   "LocationIQ Access Token": "LocationIQ アクセストークン",
   "Public access token for LocationIQ services.": "LocationIQ サービス用のパブリックアクセストークン。",
   "Style Renderer": "スタイルレンダラ",
-  "Choose the default Maputnik renderer for this style.": "このスタイルのデフォルトの Maputnik レンダラを選択してください"
+  "Choose the default Maputnik renderer for this style.": "このスタイルのデフォルトの Maputnik レンダラを選択してください",
+  "Open color picker": "カラーピッカーを開く",
+  "Close color picker": "カラーピッカーを閉じる",
+  "Color picker": "カラーピッカー",
+  "Invalid color": "無効な色"
 }
