@@ -1,6 +1,7 @@
 import React, {type JSX} from "react";
 import classnames from "classnames";
 import lodash from "lodash";
+import {MdClose} from "react-icons/md";
 import {
   DndContext,
   PointerSensor,
@@ -24,6 +25,20 @@ import { findClosestCommonPrefix, layerPrefix } from "../libs/layer";
 import { type WithTranslation, withTranslation } from "react-i18next";
 import { type MappedError, type OnMoveLayerCallback } from "../libs/definitions";
 
+type LayerListEntry = LayerSpecification & {key: string};
+
+function layerMatchesFilter(layer: LayerSpecification, query: string, typeFilter: string): boolean {
+  if (typeFilter && layer.type !== typeFilter) {
+    return false;
+  }
+  const normalizedQuery = query.trim().toLowerCase();
+  if (!normalizedQuery) {
+    return true;
+  }
+  return layer.id.toLowerCase().includes(normalizedQuery) ||
+    layer.type.toLowerCase().includes(normalizedQuery);
+}
+
 type LayerListContainerProps = {
   layers: LayerSpecification[]
   selectedLayerIndex: number
@@ -38,10 +53,12 @@ type LayerListContainerProps = {
 type LayerListContainerInternalProps = LayerListContainerProps & WithTranslation;
 
 type LayerListContainerState = {
-  collapsedGroups: {[ket: string]: boolean}
+  collapsedGroups: {[key: string]: boolean}
   areAllGroupsExpanded: boolean
   keys: {[key: string]: number}
   isOpen: {[key: string]: boolean}
+  searchQuery: string
+  selectedType: string
 };
 
 // List of collapsible layer editors
@@ -51,11 +68,15 @@ class LayerListContainerInternal extends React.Component<LayerListContainerInter
   };
   selectedItemRef: React.RefObject<any>;
   scrollContainerRef: React.RefObject<HTMLElement | null>;
+  searchInputRef: React.RefObject<HTMLInputElement | null>;
+  firstMatchLayerId: string | null;
 
   constructor(props: LayerListContainerInternalProps) {
     super(props);
     this.selectedItemRef = React.createRef();
     this.scrollContainerRef = React.createRef();
+    this.searchInputRef = React.createRef();
+    this.firstMatchLayerId = null;
     this.state = {
       collapsedGroups: {},
       areAllGroupsExpanded: false,
@@ -64,7 +85,9 @@ class LayerListContainerInternal extends React.Component<LayerListContainerInter
       },
       isOpen: {
         add: false,
-      }
+      },
+      searchQuery: "",
+      selectedType: "",
     };
   }
 
@@ -106,7 +129,7 @@ class LayerListContainerInternal extends React.Component<LayerListContainerInter
     });
   };
 
-  groupedLayers(): (LayerSpecification & {key: string})[][] {
+  groupedLayers(): LayerListEntry[][] {
     const groups = [];
     const layerIdCount = new Map();
 
@@ -148,17 +171,51 @@ class LayerListContainerInternal extends React.Component<LayerListContainerInter
     return collapsed === undefined ? true : collapsed;
   }
 
+  typesInStyle(): string[] {
+    const types: string[] = [];
+    for (const layer of this.props.layers) {
+      if (!types.includes(layer.type)) {
+        types.push(layer.type);
+      }
+    }
+    return types;
+  }
+
+  onSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    this.setState({ searchQuery: event.target.value });
+  };
+
+  onSearchKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Escape" && this.state.searchQuery) {
+      event.stopPropagation();
+      this.setState({ searchQuery: "" });
+    }
+  };
+
+  clearSearch = () => {
+    this.setState({ searchQuery: "" }, () => {
+      this.searchInputRef.current?.focus();
+    });
+  };
+
+  selectTypeFilter = (type: string) => {
+    this.setState({
+      selectedType: this.state.selectedType === type ? "" : type
+    });
+  };
+
   shouldComponentUpdate (nextProps: LayerListContainerProps, nextState: LayerListContainerState) {
     // Always update on state change
     if (this.state !== nextState) {
       return true;
     }
 
-    // This component tree only requires id and visibility from the layers
+    // This component tree only requires id, type, and visibility from the layers
     // objects
     function getRequiredProps(layer: LayerSpecification) {
-      const out: {id: string, layout?: { visibility: any}} = {
+      const out: {id: string, type: string, layout?: { visibility: any}} = {
         id: layer.id,
+        type: layer.type,
       };
 
       if (layer.layout) {
@@ -192,7 +249,7 @@ class LayerListContainerInternal extends React.Component<LayerListContainerInter
     return propsChanged;
   }
 
-  componentDidUpdate (prevProps: LayerListContainerProps) {
+  componentDidUpdate (prevProps: LayerListContainerProps, prevState: LayerListContainerState) {
     if (prevProps.selectedLayerIndex !== this.props.selectedLayerIndex) {
       const selectedItemNode = this.selectedItemRef.current;
       if (selectedItemNode && selectedItemNode.node) {
@@ -211,6 +268,18 @@ class LayerListContainerInternal extends React.Component<LayerListContainerInter
         observer.observe(target);
       }
     }
+
+    const filterChanged =
+      prevState.searchQuery !== this.state.searchQuery ||
+      prevState.selectedType !== this.state.selectedType;
+    if (filterChanged && this.firstMatchLayerId) {
+      const root = this.scrollContainerRef.current;
+      const key = "layer-list-item:" + this.firstMatchLayerId;
+      const target = root?.querySelector(`[data-wd-key=${JSON.stringify(key)}]`);
+      if (target) {
+        target.scrollIntoView({ block: "nearest" });
+      }
+    }
   }
 
   render() {
@@ -218,49 +287,81 @@ class LayerListContainerInternal extends React.Component<LayerListContainerInter
     const listItems: JSX.Element[] = [];
     let idx = 0;
     const layersByGroup = this.groupedLayers();
+    const searchQuery = this.state.searchQuery;
+    const selectedType = this.state.selectedType;
+    const isFiltering = Boolean(searchQuery.trim() || selectedType);
+    this.firstMatchLayerId = null;
+    let assignedFirstMatch = false;
+    let matchCount = 0;
+
     layersByGroup.forEach(layers => {
       const groupPrefix = layerPrefix(layers[0].id);
+      const groupStartIdx = idx;
+      const visible: {layer: LayerListEntry, idx: number}[] = [];
+
+      layers.forEach((layer) => {
+        const layerIdx = idx;
+        idx += 1;
+        if (isFiltering && !layerMatchesFilter(layer, searchQuery, selectedType)) {
+          return;
+        }
+        visible.push({layer, idx: layerIdx});
+        matchCount += 1;
+      });
+
+      if (visible.length === 0) {
+        return;
+      }
+
       if(layers.length > 1) {
         const grp = <LayerListGroup
-          data-wd-key={[groupPrefix, idx].join("-")}
-          aria-controls={layers.map(l => l.key).join(" ")}
-          key={`group-${groupPrefix}-${idx}`}
+          data-wd-key={[groupPrefix, groupStartIdx].join("-")}
+          aria-controls={visible.map(item => item.layer.key).join(" ")}
+          key={`group-${groupPrefix}-${groupStartIdx}`}
           title={groupPrefix}
-          isActive={!this.isCollapsed(groupPrefix, idx) || idx === this.props.selectedLayerIndex}
-          onActiveToggle={this.toggleLayerGroup.bind(this, groupPrefix, idx)}
+          isActive={isFiltering || !this.isCollapsed(groupPrefix, groupStartIdx) || visible.some(item => item.idx === this.props.selectedLayerIndex)}
+          onActiveToggle={this.toggleLayerGroup.bind(this, groupPrefix, groupStartIdx)}
         />;
         listItems.push(grp);
       }
 
-      layers.forEach((layer, idxInGroup) => {
-        const groupIdx = findClosestCommonPrefix(this.props.layers, idx);
+      visible.forEach((item, visibleIndex) => {
+        const {layer, idx: layerIdx} = item;
+        const groupIdx = findClosestCommonPrefix(this.props.layers, layerIdx);
 
         const layerError = this.props.errors.find(error => {
           return (
             error.parsed &&
             error.parsed.type === "layer" &&
-            error.parsed.data.index == idx
+            error.parsed.data.index == layerIdx
           );
         });
 
         const additionalProps: {ref?: React.RefObject<any>} = {};
-        if (idx === this.props.selectedLayerIndex) {
+        if (layerIdx === this.props.selectedLayerIndex) {
           additionalProps.ref = this.selectedItemRef;
+        }
+
+        const isFirstMatch = isFiltering && !assignedFirstMatch;
+        if (isFirstMatch) {
+          assignedFirstMatch = true;
+          this.firstMatchLayerId = layer.id;
         }
 
         const listItem = <LayerListItem
           className={classnames({
-            "maputnik-layer-list-item-collapsed": layers.length > 1 && this.isCollapsed(groupPrefix, groupIdx) && idx !== this.props.selectedLayerIndex,
-            "maputnik-layer-list-item-group-last": idxInGroup == layers.length - 1 && layers.length > 1,
-            "maputnik-layer-list-item--error": !!layerError
+            "maputnik-layer-list-item-collapsed": !isFiltering && layers.length > 1 && this.isCollapsed(groupPrefix, groupIdx) && layerIdx !== this.props.selectedLayerIndex,
+            "maputnik-layer-list-item-group-last": visibleIndex === visible.length - 1 && layers.length > 1,
+            "maputnik-layer-list-item--error": !!layerError,
+            "maputnik-layer-list-item--first-match": isFirstMatch,
           })}
           key={layer.key}
           id={layer.key}
           layerId={layer.id}
-          layerIndex={idx}
+          layerIndex={layerIdx}
           layerType={layer.type}
           visibility={(layer.layout || {}).visibility}
-          isSelected={idx === this.props.selectedLayerIndex}
+          isSelected={layerIdx === this.props.selectedLayerIndex}
           onLayerSelect={this.props.onLayerSelect}
           onLayerDestroy={this.props.onLayerDestroy?.bind(this)}
           onLayerCopy={this.props.onLayerCopy.bind(this)}
@@ -268,11 +369,12 @@ class LayerListContainerInternal extends React.Component<LayerListContainerInter
           {...additionalProps}
         />;
         listItems.push(listItem);
-        idx += 1;
       });
     });
 
     const t = this.props.t;
+    const typesInStyle = this.typesInStyle();
+    const showTypeFilters = typesInStyle.length > 1;
 
     return <section
       className="maputnik-layer-list"
@@ -290,32 +392,94 @@ class LayerListContainerInternal extends React.Component<LayerListContainerInter
         onLayersChange={this.props.onLayersChange}
       />
       <header className="maputnik-layer-list-header" data-wd-key="layer-list.header">
-        <span className="maputnik-layer-list-header-title">{t("Layers")}</span>
-        <span className="maputnik-space" />
-        <div className="maputnik-default-property">
-          <div className="maputnik-multibutton">
-            <button
-              id="skip-target-layer-list"
-              data-wd-key="skip-target-layer-list"
-              onClick={this.toggleLayers}
-              className="maputnik-button">
-              {this.state.areAllGroupsExpanded === true ?
-                t("Collapse")
-                :
-                t("Expand")
-              }
-            </button>
+        <div className="maputnik-layer-list-header-row">
+          <span className="maputnik-layer-list-header-title">{t("Layers")}</span>
+          <span className="maputnik-space" />
+          <div className="maputnik-default-property">
+            <div className="maputnik-multibutton">
+              <button
+                id="skip-target-layer-list"
+                data-wd-key="skip-target-layer-list"
+                onClick={this.toggleLayers}
+                className="maputnik-button">
+                {this.state.areAllGroupsExpanded === true ?
+                  t("Collapse")
+                  :
+                  t("Expand")
+                }
+              </button>
+            </div>
+          </div>
+          <div className="maputnik-default-property">
+            <div className="maputnik-multibutton">
+              <button
+                onClick={this.toggleModal.bind(this, "add")}
+                data-wd-key="layer-list:add-layer"
+                className="maputnik-button maputnik-button-selected">
+                {t("Add Layer")}
+              </button>
+            </div>
           </div>
         </div>
-        <div className="maputnik-default-property">
-          <div className="maputnik-multibutton">
-            <button
-              onClick={this.toggleModal.bind(this, "add")}
-              data-wd-key="layer-list:add-layer"
-              className="maputnik-button maputnik-button-selected">
-              {t("Add Layer")}
-            </button>
+        <div className="maputnik-layer-list-filter" role="search">
+          <div className="maputnik-layer-list-search">
+            <input
+              ref={this.searchInputRef}
+              type="search"
+              className="maputnik-string maputnik-layer-list-search-input"
+              value={searchQuery}
+              onChange={this.onSearchChange}
+              onKeyDown={this.onSearchKeyDown}
+              placeholder={t("Search layers")}
+              aria-label={t("Search layers")}
+              data-wd-key="layer-list.search"
+              autoComplete="off"
+              autoCorrect="off"
+              autoCapitalize="off"
+              spellCheck={false}
+              name="layer-list-search"
+            />
+            {searchQuery ? (
+              <button
+                type="button"
+                className="maputnik-layer-list-search-clear"
+                onClick={this.clearSearch}
+                aria-label={t("Clear search")}
+                data-wd-key="layer-list.search.clear"
+              >
+                <MdClose size={14} />
+              </button>
+            ) : null}
           </div>
+          {showTypeFilters ? (
+            <div
+              className="maputnik-layer-list-type-filters"
+              role="group"
+              aria-label={t("Filter by type")}
+            >
+              <button
+                type="button"
+                className="maputnik-layer-list-type-chip"
+                aria-pressed={!selectedType}
+                data-wd-key="layer-list.filter-type:all"
+                onClick={() => this.setState({ selectedType: "" })}
+              >
+                {t("All types")}
+              </button>
+              {typesInStyle.map((type) => (
+                <button
+                  type="button"
+                  key={type}
+                  className="maputnik-layer-list-type-chip"
+                  aria-pressed={selectedType === type}
+                  data-wd-key={"layer-list.filter-type:" + type}
+                  onClick={() => this.selectTypeFilter(type)}
+                >
+                  {type}
+                </button>
+              ))}
+            </div>
+          ) : null}
         </div>
       </header>
       <div
@@ -325,6 +489,15 @@ class LayerListContainerInternal extends React.Component<LayerListContainerInter
         <ul className="maputnik-layer-list-container">
           {listItems}
         </ul>
+        {isFiltering && matchCount === 0 ? (
+          <p
+            className="maputnik-layer-list-empty"
+            role="status"
+            data-wd-key="layer-list.no-results"
+          >
+            {t("No matching layers")}
+          </p>
+        ) : null}
       </div>
     </section>;
   }

@@ -12,6 +12,7 @@
 - Upgraded codemirror from version 5 to version 6
 - Add code editor to allow editing the entire style
 - Add support for sprite object in setting modal
+- Add a sticky search and type filter to the layer list
 - _...Add new stuff here..._
 
 ### 🐞 Bug fixes

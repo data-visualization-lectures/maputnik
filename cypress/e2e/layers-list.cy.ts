@@ -516,6 +516,104 @@ describe("layers list", () => {
     });
   });
 
+  describe("search and filter", () => {
+    beforeEach(() => {
+      when.modal.fillLayers({
+        id: "water",
+        type: "fill",
+        layer: "example",
+      });
+      when.modal.open();
+      when.modal.fillLayers({
+        id: "roads",
+        type: "line",
+        layer: "example",
+      });
+      when.modal.open();
+      when.modal.fillLayers({
+        id: "places",
+        type: "symbol",
+        layer: "example",
+      });
+    });
+
+    it("filters layers by id", () => {
+      when.setValue("layer-list.search", "road");
+      then(get.elementByTestId("layer-list-item:roads")).shouldBeVisible();
+      then(get.elementByTestId("layer-list-item:water")).shouldNotExist();
+      then(get.elementByTestId("layer-list-item:places")).shouldNotExist();
+    });
+
+    it("filters layers by type in the search query", () => {
+      when.setValue("layer-list.search", "symbol");
+      then(get.elementByTestId("layer-list-item:places")).shouldBeVisible();
+      then(get.elementByTestId("layer-list-item:water")).shouldNotExist();
+      then(get.elementByTestId("layer-list-item:roads")).shouldNotExist();
+    });
+
+    it("filters layers by type chip", () => {
+      when.click("layer-list.filter-type:fill");
+      then(get.elementByTestId("layer-list-item:water")).shouldBeVisible();
+      then(get.elementByTestId("layer-list-item:roads")).shouldNotExist();
+      then(get.elementByTestId("layer-list-item:places")).shouldNotExist();
+    });
+
+    it("clears type filter with the all types chip", () => {
+      when.click("layer-list.filter-type:fill");
+      then(get.elementByTestId("layer-list-item:roads")).shouldNotExist();
+      when.click("layer-list.filter-type:all");
+      then(get.elementByTestId("layer-list-item:roads")).shouldBeVisible();
+      then(get.elementByTestId("layer-list-item:water")).shouldBeVisible();
+      then(get.elementByTestId("layer-list-item:places")).shouldBeVisible();
+    });
+
+    it("clears the search query", () => {
+      when.setValue("layer-list.search", "zzz");
+      then(get.elementByTestId("layer-list.no-results")).shouldBeVisible();
+      when.click("layer-list.search.clear");
+      then(get.elementByTestId("layer-list-item:water")).shouldBeVisible();
+      then(get.elementByTestId("layer-list-item:roads")).shouldBeVisible();
+      then(get.elementByTestId("layer-list-item:places")).shouldBeVisible();
+    });
+
+    it("shows no matching layers message", () => {
+      when.setValue("layer-list.search", "does-not-exist");
+      then(get.elementByTestId("layer-list.no-results")).shouldBeVisible();
+    });
+
+    it("keeps grouping when the filter is empty", () => {
+      when.modal.open();
+      when.modal.fillLayers({
+        id: "foo",
+        type: "background",
+      });
+      when.modal.open();
+      when.modal.fillLayers({
+        id: "foo_bar",
+        type: "background",
+      });
+      then(get.elementByTestId("layer-list-item:foo")).shouldBeVisible();
+      then(get.elementByTestId("layer-list-item:foo_bar")).shouldNotBeVisible();
+    });
+
+    it("reveals matching layers in collapsed groups", () => {
+      when.modal.open();
+      when.modal.fillLayers({
+        id: "foo",
+        type: "background",
+      });
+      when.modal.open();
+      when.modal.fillLayers({
+        id: "foo_bar",
+        type: "background",
+      });
+      then(get.elementByTestId("layer-list-item:foo_bar")).shouldNotBeVisible();
+      when.setValue("layer-list.search", "foo_bar");
+      then(get.elementByTestId("layer-list-item:foo_bar")).shouldBeVisible();
+      then(get.elementByTestId("layer-list-item:foo")).shouldNotExist();
+    });
+  });
+
   describe("sticky header", () => {
     it("should keep header visible when scrolling layer list", () => {
       // Setup: Create multiple layers to enable scrolling
@@ -536,6 +634,7 @@ describe("layers list", () => {
       when.wait(200);
       then(header).shouldBeVisible();
       then(get.elementByTestId("layer-list:add-layer")).shouldBeVisible();
+      then(get.elementByTestId("layer-list.search")).shouldBeVisible();
     });
   });
 });
