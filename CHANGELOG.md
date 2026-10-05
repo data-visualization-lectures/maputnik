@@ -12,6 +12,8 @@
 - Upgraded codemirror from version 5 to version 6
 - Add code editor to allow editing the entire style
 - Add support for sprite object in setting modal
+- Add a guided expression builder for common `get`, `match`, `case`, and zoom `interpolate`/`step` patterns, with the JSON editor kept as an Advanced tab
+- Replace icon-only zoom/data/expression conversion buttons with an explicit `fx` menu (`Expression…`, `Data stops`, `Zoom stops`)
 - _...Add new stuff here..._
 
 ### 🐞 Bug fixes

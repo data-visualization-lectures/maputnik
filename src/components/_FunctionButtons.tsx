@@ -3,6 +3,7 @@ import React from "react";
 import InputButton from "./InputButton";
 import {MdFunctions, MdInsertChart} from "react-icons/md";
 import { TbMathFunction } from "react-icons/tb";
+import { Wrapper, Button, Menu, MenuItem } from "react-aria-menubutton";
 import { type WithTranslation, withTranslation } from "react-i18next";
 
 type FunctionInputButtonsInternalProps = {
@@ -18,39 +19,66 @@ class FunctionInputButtonsInternal extends React.Component<FunctionInputButtonsI
     const t = this.props.t;
 
     if (this.props.fieldSpec.expression?.parameters.includes("zoom")) {
-      const expressionInputButton = (
-        <InputButton
-          className="maputnik-make-zoom-function"
-          onClick={this.props.onExpressionClick}
-          title={t("Convert to expression")}
-        >
-          <TbMathFunction />
-        </InputButton>
-      );
+      const items: {id: string, text: string, wdKey: string, handler?: () => void}[] = [
+        {
+          id: "expression",
+          text: t("Expression…"),
+          wdKey: "function-menu:expression",
+          handler: this.props.onExpressionClick,
+        },
+      ];
 
-      const makeZoomInputButton = <InputButton
-        className="maputnik-make-zoom-function"
-        onClick={this.props.onZoomClick}
-        title={t("Convert property into a zoom function")}
-      >
-        <MdFunctions />
-      </InputButton>;
-
-      let makeDataInputButton;
       if (this.props.fieldSpec["property-type"] === "data-driven") {
-        makeDataInputButton = <InputButton
-          className="maputnik-make-data-function"
-          onClick={this.props.onDataClick}
-          title={t("Convert property to data function")}
-        >
-          <MdInsertChart />
-        </InputButton>;
+        items.push({
+          id: "data",
+          text: t("Data stops"),
+          wdKey: "function-menu:data",
+          handler: this.props.onDataClick,
+        });
       }
-      return <div>
-        {expressionInputButton}
-        {makeDataInputButton}
-        {makeZoomInputButton}
-      </div>;
+
+      items.push({
+        id: "zoom",
+        text: t("Zoom stops"),
+        wdKey: "function-menu:zoom",
+        handler: this.props.onZoomClick,
+      });
+
+      const handleSelection = (id: string, event: React.SyntheticEvent) => {
+        event.stopPropagation();
+        const item = items.find((entry) => entry.id === id);
+        item?.handler?.();
+      };
+
+      return (
+        <Wrapper
+          className="maputnik-function-menu"
+          onSelection={handleSelection}
+        >
+          <Button
+            className="maputnik-button maputnik-make-zoom-function maputnik-function-menu__button"
+            title={t("Convert property")}
+            data-wd-key="function-menu"
+          >
+            <TbMathFunction />
+            <span className="maputnik-function-menu__label">{t("fx")}</span>
+          </Button>
+          <Menu>
+            <ul className="maputnik-function-menu__menu">
+              {items.map((item) => (
+                <li key={item.id}>
+                  <MenuItem value={item.id} className="maputnik-function-menu__item" data-wd-key={item.wdKey}>
+                    {item.id === "expression" && <TbMathFunction />}
+                    {item.id === "data" && <MdInsertChart />}
+                    {item.id === "zoom" && <MdFunctions />}
+                    <span>{item.text}</span>
+                  </MenuItem>
+                </li>
+              ))}
+            </ul>
+          </Menu>
+        </Wrapper>
+      );
     } else if (this.props.fieldSpec.expression?.parameters.includes("elevation")) {
       const inputElevationButton = <InputButton
         className="maputnik-make-elevation-function"
@@ -59,6 +87,7 @@ class FunctionInputButtonsInternal extends React.Component<FunctionInputButtonsI
         data-wd-key='make-elevation-function'
       >
         <MdFunctions />
+        <span>{t("Elevation")}</span>
       </InputButton>;
       return <div>{inputElevationButton}</div>;
     } else {
