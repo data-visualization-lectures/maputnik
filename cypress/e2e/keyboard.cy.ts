@@ -56,5 +56,10 @@ describe("keyboard", () => {
       when.typeKeys("!");
       then(get.elementByTestId("modal:debug")).shouldBeVisible();
     });
+
+    it("'g' should show global state modal", () => {
+      when.typeKeys("g");
+      then(get.elementByTestId("modal:global-state")).shouldBeVisible();
+    });
   });
 });

@@ -23,9 +23,17 @@ class ModalLoadingInternal extends React.Component<ModalLoadingInternalProps> {
       title={this.props.title}
       onOpenToggle={() => this.props.onCancel()}
     >
-      <p>
-        {this.props.message}
-      </p>
+      <div
+        className="maputnik-loading"
+        role="status"
+        aria-live="polite"
+        aria-busy="true"
+      >
+        <span className="maputnik-loading__spinner" aria-hidden="true" />
+        <p>
+          {this.props.message}
+        </p>
+      </div>
       <p className="maputnik-dialog__buttons">
         <InputButton onClick={(e) => this.props.onCancel(e)}>
           {t("Cancel")}

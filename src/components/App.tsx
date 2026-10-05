@@ -27,6 +27,9 @@ import ModalOpen from "./modals/ModalOpen";
 import ModalShortcuts from "./modals/ModalShortcuts";
 import ModalDebug from "./modals/ModalDebug";
 import ModalGlobalState from "./modals/ModalGlobalState";
+import ModalAdd from "./modals/ModalAdd";
+import ModalConfirm from "./modals/ModalConfirm";
+import EmptyLayersState from "./EmptyLayersState";
 
 import { downloadGlyphsMetadata, downloadSpriteMetadata } from "../libs/metadata";
 import style from "../libs/style";
@@ -38,6 +41,8 @@ import { tokens } from "../config/tokens";
 import isEqual from "lodash.isequal";
 import { type MapOptions } from "maplibre-gl";
 import { type MappedError, type OnStyleChangedOpts, type StyleSpecificationWithId } from "../libs/definitions";
+import generateUniqueId from "../libs/document-uid";
+import { withTranslation, type WithTranslation } from "react-i18next";
 
 // Buffer must be defined globally for @maplibre/maplibre-gl-style-spec validate() function to succeed.
 window.Buffer = buffer.Buffer;
@@ -120,9 +125,14 @@ type AppState = {
     codeEditor: boolean
   }
   fileHandle: FileSystemFileHandle | null
+  canUndo: boolean
+  canRedo: boolean
+  isAddLayerOpen: boolean
+  addLayerModalKey: number
+  pendingDeleteLayer: { index: number, id: string } | null
 };
 
-export default class App extends React.Component<any, AppState> {
+class AppInternal extends React.Component<WithTranslation, AppState> {
   revisionStore: RevisionStore;
   styleStore: IStyleStore | null = null;
   layerWatcher: LayerWatcher;
@@ -168,6 +178,11 @@ export default class App extends React.Component<any, AppState> {
         debugToolbox: false,
       },
       fileHandle: null,
+      canUndo: false,
+      canRedo: false,
+      isAddLayerOpen: false,
+      addLayerModalKey: 0,
+      pendingDeleteLayer: null,
     };
 
     this.layerWatcher = new LayerWatcher({
@@ -470,6 +485,8 @@ export default class App extends React.Component<any, AppState> {
       mapStyle: newStyle,
       dirtyMapStyle: dirtyMapStyle,
       errors: mappedErrors,
+      canUndo: this.revisionStore.canUndo,
+      canRedo: this.revisionStore.canRedo,
     }, () => {
       this.fetchSources();
       this.setStateInUrl();
@@ -523,10 +540,56 @@ export default class App extends React.Component<any, AppState> {
   };
 
   onLayerDestroy = (index: number) => {
-    const layers = this.state.mapStyle.layers;
-    const remainingLayers = layers.slice(0);
-    remainingLayers.splice(index, 1);
+    const layer = this.state.mapStyle.layers[index];
+    if (!layer) {
+      return;
+    }
+    this.setState({
+      pendingDeleteLayer: { index, id: layer.id },
+    });
+  };
+
+  cancelLayerDestroy = () => {
+    this.setState({
+      pendingDeleteLayer: null,
+    });
+  };
+
+  confirmLayerDestroy = () => {
+    const pending = this.state.pendingDeleteLayer;
+    if (!pending) {
+      return;
+    }
+
+    const remainingLayers = this.state.mapStyle.layers.slice(0);
+    remainingLayers.splice(pending.index, 1);
+    let nextIndex = this.state.selectedLayerIndex;
+    if (pending.index < nextIndex) {
+      nextIndex -= 1;
+    }
+    nextIndex = remainingLayers.length === 0
+      ? 0
+      : Math.min(nextIndex, remainingLayers.length - 1);
+
+    this.setState({
+      pendingDeleteLayer: null,
+      selectedLayerIndex: nextIndex,
+      selectedLayerOriginalId: remainingLayers[nextIndex]?.id,
+    });
     this.onLayersChange(remainingLayers);
+  };
+
+  openAddLayer = () => {
+    this.setState({
+      isAddLayerOpen: true,
+      addLayerModalKey: +generateUniqueId(),
+    });
+  };
+
+  closeAddLayer = () => {
+    this.setState({
+      isAddLayerOpen: false,
+    });
   };
 
   onLayerCopy = (index: number) => {
@@ -847,8 +910,10 @@ export default class App extends React.Component<any, AppState> {
   };
 
   render() {
+    const t = this.props.t;
     const layers = this.state.mapStyle.layers || [];
     const selectedLayer = layers.length > 0 ? layers[this.state.selectedLayerIndex] : undefined;
+    const pendingDelete = this.state.pendingDeleteLayer;
 
     const toolbar = <AppToolbar
       renderer={this._getRenderer()}
@@ -860,6 +925,10 @@ export default class App extends React.Component<any, AppState> {
       onStyleOpen={this.onStyleChanged}
       onSetMapState={this.setMapState}
       onToggleModal={(modal: keyof AppState["isOpen"]) => this.toggleModal(modal)}
+      onUndo={this.onUndo}
+      onRedo={this.onRedo}
+      canUndo={this.state.canUndo}
+      canRedo={this.state.canRedo}
     />;
 
     const codeEditor = this.state.isOpen.codeEditor ? <CodeEditor
@@ -875,6 +944,7 @@ export default class App extends React.Component<any, AppState> {
       onLayerVisibilityToggle={this.onLayerVisibilityToggle}
       onLayersChange={this.onLayersChange}
       onLayerSelect={this.onLayerSelect}
+      onOpenAddLayer={this.openAddLayer}
       selectedLayerIndex={this.state.selectedLayerIndex}
       layers={layers}
       sources={this.state.sources}
@@ -897,7 +967,19 @@ export default class App extends React.Component<any, AppState> {
       onLayerVisibilityToggle={this.onLayerVisibilityToggle}
       onLayerIdChange={this.onLayerIdChange}
       errors={this.state.errors}
-    /> : undefined;
+    /> : <section
+      className="maputnik-layer-editor"
+      role="main"
+      aria-label={t("Layer editor")}
+      data-wd-key="layer-editor"
+    >
+      <EmptyLayersState
+        wdKey="layer-editor:empty"
+        addLayerWdKey="layer-editor:empty-add-layer"
+        skipTargetId="skip-target-layer-editor"
+        onAddLayer={this.openAddLayer}
+      />
+    </section>;
 
     const bottomPanel = (this.state.errors.length + this.state.infos.length) > 0 ? <MessagePanel
       currentLayer={selectedLayer}
@@ -957,6 +1039,25 @@ export default class App extends React.Component<any, AppState> {
         isOpen={this.state.isOpen.globalState}
         onOpenToggle={() => this.toggleModal("globalState")}
       />
+      <ModalAdd
+        key={this.state.addLayerModalKey}
+        layers={layers}
+        sources={this.state.sources}
+        isOpen={this.state.isAddLayerOpen}
+        onOpenToggle={this.closeAddLayer}
+        onLayersChange={this.onLayersChange}
+      />
+      <ModalConfirm
+        data-wd-key="modal:confirm-delete"
+        isOpen={!!pendingDelete}
+        title={t("Delete this layer?")}
+        message={t("This will remove {{layerId}}. You can undo this action afterwards.", {
+          layerId: pendingDelete?.id || "",
+        })}
+        confirmLabel={t("Delete")}
+        onCancel={this.cancelLayerDestroy}
+        onConfirm={this.confirmLayerDestroy}
+      />
     </div>;
 
     return <AppLayout
@@ -970,3 +1071,6 @@ export default class App extends React.Component<any, AppState> {
     />;
   }
 }
+
+const App = withTranslation()(AppInternal);
+export default App;

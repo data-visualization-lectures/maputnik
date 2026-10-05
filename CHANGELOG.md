@@ -2,6 +2,7 @@
 
 ### ✨ Features and improvements
 - Added translation to "Links" in debug modal
+- Improve layer list, toolbar, and modal accessibility: always-visible selected/focused layer actions, delete confirmation, Undo/Redo controls, live regions, empty-layer CTA, and Export labeling
 - Add support for hillshade's color arrays and relief-color elevation expression
 - Change layers icons to make them a bit more distinct
 - Remove `@mdi` packages in favor of `react-icons`

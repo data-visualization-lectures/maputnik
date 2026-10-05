@@ -117,6 +117,7 @@
   }
 
   .maputnik-layer-list-item:hover,
+  .maputnik-layer-list-item:focus-within,
   .maputnik-layer-list-item-selected {
     background-color: color.adjust(vars.$color-black, $lightness: 2%);
 
@@ -343,4 +344,22 @@
   font-family: vars.$font-family;
   z-index: 9999;
   border: none;
+}
+
+.maputnik-empty-layers {
+  padding: vars.$margin-3;
+  color: vars.$color-lowgray;
+  font-size: vars.$font-size-6;
+  line-height: 1.4;
+
+  &__title {
+    margin: 0 0 vars.$margin-2;
+    color: vars.$color-white;
+    font-size: vars.$font-size-5;
+    font-weight: bold;
+  }
+
+  &__hint {
+    margin: 0 0 vars.$margin-3;
+  }
 }

@@ -18,6 +18,14 @@ export class RevisionStore {
     return this.revisions[this.currentIdx];
   }
 
+  get canUndo() {
+    return this.currentIdx > 0;
+  }
+
+  get canRedo() {
+    return this.currentIdx >= 0 && this.currentIdx < this.revisions.length - 1;
+  }
+
   addRevision(revision: StyleSpecificationWithId) {
     // clear any "redo" revisions once a change is made
     // and ensure current index is at end of list

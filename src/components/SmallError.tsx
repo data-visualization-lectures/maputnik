@@ -11,7 +11,7 @@ class SmallErrorInternal extends React.Component<SmallErrorInternalProps> {
   render () {
     const t = this.props.t;
     return (
-      <div className="SmallError">
+      <div className="SmallError" role="alert">
         {t("Error:")} {this.props.children}
       </div>
     );

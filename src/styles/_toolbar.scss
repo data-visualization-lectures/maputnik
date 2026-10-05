@@ -98,6 +98,15 @@
   background: inherit;
   border-width: 0;
   @extend .maputnik-toolbar-link !optional; /* stylelint-disable-line */
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+
+    &:hover {
+      background-color: vars.$color-black;
+    }
+  }
 }
 
 .maputnik-toolbar-select {

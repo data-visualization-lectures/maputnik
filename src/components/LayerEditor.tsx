@@ -385,7 +385,8 @@ class LayerEditorInternal extends React.Component<LayerEditorInternalProps, Laye
                   id="skip-target-layer-editor"
                   data-wd-key="skip-target-layer-editor"
                   className='more-menu__button'
-                  title={"Layer options"}>
+                  title={t("Layer options")}
+                  aria-label={t("Layer options")}>
                   <MdMoreVert className="more-menu__button__svg" />
                 </Button>
                 <Menu>

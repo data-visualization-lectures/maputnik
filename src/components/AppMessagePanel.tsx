@@ -56,9 +56,17 @@ class AppMessagePanelInternal extends React.Component<AppMessagePanelInternalPro
       return <p key={"info-"+i}>{m}</p>;
     });
 
-    return <div className="maputnik-message-panel">
-      {errors}
-      {infos}
+    return <div className="maputnik-message-panel" aria-label={t("Notifications")}>
+      {!!errors?.length &&
+        <div role="alert" aria-live="assertive" aria-atomic="true">
+          {errors}
+        </div>
+      }
+      {!!infos?.length &&
+        <div role="status" aria-live="polite" aria-atomic="true">
+          {infos}
+        </div>
+      }
     </div>;
   }
 }

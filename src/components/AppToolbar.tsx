@@ -11,7 +11,9 @@ import {
   MdLanguage,
   MdSave,
   MdPublic,
-  MdCode
+  MdCode,
+  MdUndo,
+  MdRedo
 } from "react-icons/md";
 import pkgJson from "../../package.json";
 //@ts-ignore
@@ -77,6 +79,9 @@ type ToolbarActionProps = {
   children?: React.ReactNode
   onClick?(...args: unknown[]): unknown
   wdKey?: string
+  disabled?: boolean
+  title?: string
+  ariaLabel?: string
 };
 
 class ToolbarAction extends React.Component<ToolbarActionProps> {
@@ -85,6 +90,9 @@ class ToolbarAction extends React.Component<ToolbarActionProps> {
       className='maputnik-toolbar-action'
       data-wd-key={this.props.wdKey}
       onClick={this.props.onClick}
+      disabled={this.props.disabled}
+      title={this.props.title}
+      aria-label={this.props.ariaLabel}
     >
       {this.props.children}
     </button>;
@@ -106,6 +114,10 @@ type AppToolbarInternalProps = {
   onSetMapState(mapState: MapState): unknown
   mapState?: MapState
   renderer?: string
+  onUndo(): void
+  onRedo(): void
+  canUndo: boolean
+  canRedo: boolean
 } & WithTranslation;
 
 class AppToolbarInternal extends React.Component<AppToolbarInternalProps> {
@@ -221,14 +233,34 @@ class AppToolbarInternal extends React.Component<AppToolbarInternalProps> {
             </h1>
           </a>
         </div>
-        <div className="maputnik-toolbar__actions" role="navigation" aria-label="Toolbar">
+        <div className="maputnik-toolbar__actions" role="navigation" aria-label={t("Toolbar")}>
           <ToolbarAction wdKey="nav:open" onClick={() => this.props.onToggleModal("open")}>
             <MdOpenInBrowser />
             <IconText>{t("Open")}</IconText>
           </ToolbarAction>
           <ToolbarAction wdKey="nav:export" onClick={() => this.props.onToggleModal("export")}>
             <MdSave />
-            <IconText>{t("Save")}</IconText>
+            <IconText>{t("Export")}</IconText>
+          </ToolbarAction>
+          <ToolbarAction
+            wdKey="nav:undo"
+            onClick={() => this.props.onUndo()}
+            disabled={!this.props.canUndo}
+            title={t("Undo")}
+            ariaLabel={t("Undo")}
+          >
+            <MdUndo />
+            <IconText>{t("Undo")}</IconText>
+          </ToolbarAction>
+          <ToolbarAction
+            wdKey="nav:redo"
+            onClick={() => this.props.onRedo()}
+            disabled={!this.props.canRedo}
+            title={t("Redo")}
+            ariaLabel={t("Redo")}
+          >
+            <MdRedo />
+            <IconText>{t("Redo")}</IconText>
           </ToolbarAction>
           <ToolbarAction wdKey="nav:code-editor" onClick={() => this.props.onToggleModal("codeEditor")}>
             <MdCode />
@@ -278,7 +310,7 @@ class AppToolbarInternal extends React.Component<AppToolbarInternalProps> {
 
           <ToolbarSelect wdKey="nav:language">
             <MdLanguage />
-            <IconText>Language
+            <IconText>{t("Language")}
               <select
                 className="maputnik-select"
                 data-wd-key="maputnik-lang-select"

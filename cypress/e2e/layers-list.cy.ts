@@ -31,9 +31,44 @@ describe("layers list", () => {
       beforeEach(() => {
         when.click("layer-list-item:" + id + ":delete");
       });
-      it("should empty layers in local storage", () => {
+
+      it("should ask for confirmation before deleting", () => {
+        then(get.elementByTestId("modal:confirm-delete")).shouldBeVisible();
         then(get.styleFromLocalStorage()).shouldDeepNestedInclude({
-          layers: [],
+          layers: [
+            {
+              id: id,
+              type: "background",
+            },
+          ],
+        });
+      });
+
+      describe("when confirming", () => {
+        beforeEach(() => {
+          when.click("modal:confirm-delete.confirm");
+        });
+        it("should empty layers in local storage", () => {
+          then(get.styleFromLocalStorage()).shouldDeepNestedInclude({
+            layers: [],
+          });
+        });
+      });
+
+      describe("when cancelling", () => {
+        beforeEach(() => {
+          when.click("modal:confirm-delete.cancel");
+        });
+        it("should keep the layer", () => {
+          then(get.elementByTestId("modal:confirm-delete")).shouldNotExist();
+          then(get.styleFromLocalStorage()).shouldDeepNestedInclude({
+            layers: [
+              {
+                id: id,
+                type: "background",
+              },
+            ],
+          });
         });
       });
     });

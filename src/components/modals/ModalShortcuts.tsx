@@ -35,6 +35,10 @@ class ModalShortcutsInternal extends React.Component<ModalShortcutsInternalProps
         text: t("Style Settings modal")
       },
       {
+        key: <kbd>g</kbd>,
+        text: t("Global State modal")
+      },
+      {
         key: <kbd>i</kbd>,
         text: t("Toggle inspect")
       },
@@ -45,6 +49,14 @@ class ModalShortcutsInternal extends React.Component<ModalShortcutsInternalProps
       {
         key: <kbd>!</kbd>,
         text: t("Debug modal")
+      },
+      {
+        key: <><kbd>Ctrl</kbd> + <kbd>Z</kbd></>,
+        text: t("Undo")
+      },
+      {
+        key: <><kbd>Ctrl</kbd> + <kbd>Y</kbd></>,
+        text: t("Redo")
       },
     ];
 
