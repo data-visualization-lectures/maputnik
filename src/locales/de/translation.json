@@ -157,6 +157,7 @@
   "Decrease the pitch by 10 degrees.": "Neigung um 10 Grad verringern.",
   "Shortcuts": "Shortcuts",
   "Press <1>ESC</1> to lose focus of any active elements, then press one of:": "Drück <1>ESC</1>, um den Fokus von aktiven Elementen zu verlieren, und dann drück eine der folgenden Tasten:",
+  "Shortcuts work unless you are typing in a text field, dropdown, or code editor. Press one of:": "Tastenkürzel funktionieren, außer wenn du in einem Textfeld, Dropdown oder Code-Editor tippst. Drücke eine der folgenden Tasten:",
   "If the Map is in focused you can use the following shortcuts": "Wenn die Karte fokussiert ist, kannst du die folgenden Shortcuts benutzen",
   "Remove '{{sourceId}}' source": "Quelle '{{sourceId}}' entfernen",
   "Source ID": "Quellen-ID",

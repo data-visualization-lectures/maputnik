@@ -13,6 +13,28 @@ describe("history", () => {
     redoKeyCombo = isMac ? "{meta}{shift}z" : "{ctrl}y";
   });
 
+  it("undo works when a toolbar button is focused", () => {
+    when.setStyle("geojson");
+    when.modal.open();
+    when.modal.fillLayers({
+      id: "step 1",
+      type: "background",
+    });
+    then(get.styleFromLocalStorage()).shouldDeepNestedInclude({
+      layers: [
+        {
+          id: "step 1",
+          type: "background",
+        },
+      ],
+    });
+
+    when.focus("nav:open");
+    then(get.elementByTestId("nav:open")).shouldBeFocused();
+    when.typeKeysOn("nav:open", undoKeyCombo);
+    then(get.styleFromLocalStorage()).shouldDeepNestedInclude({ layers: [] });
+  });
+
   it("undo/redo", () => {
     when.setStyle("geojson");
     when.modal.open();

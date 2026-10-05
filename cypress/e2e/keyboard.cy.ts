@@ -20,6 +20,7 @@ describe("keyboard", () => {
     it("'?' should show shortcuts modal", () => {
       when.typeKeys("?");
       then(get.elementByTestId("modal:shortcuts")).shouldBeVisible();
+      then(get.element(".maputnik-modal-shortcuts")).shouldContainText("text field, dropdown, or code editor");
     });
 
     it("'o' should show open modal", () => {
@@ -55,6 +56,35 @@ describe("keyboard", () => {
     it("'!' should show debug modal", () => {
       when.typeKeys("!");
       then(get.elementByTestId("modal:debug")).shouldBeVisible();
+    });
+
+    it("letter shortcuts work when a toolbar button is focused", () => {
+      when.focus("nav:export");
+      then(get.elementByTestId("nav:export")).shouldBeFocused();
+      when.keyupOn("nav:export", "o");
+      then(get.elementByTestId("modal:open")).shouldBeVisible();
+    });
+
+    it("letter shortcuts are ignored in a text input", () => {
+      when.click("nav:open");
+      then(get.elementByTestId("modal:open")).shouldBeVisible();
+      when.typeKeysOn("modal:open.url.input", "o");
+      then(get.elementByTestId("modal:open.url.input")).shouldHaveValue("o");
+      then(get.elementByTestId("modal:export")).shouldNotExist();
+    });
+
+    it("letter shortcuts are ignored in a select", () => {
+      when.focus("maputnik-select");
+      then(get.elementByTestId("maputnik-select")).shouldBeFocused();
+      when.keyupOn("maputnik-select", "o");
+      then(get.elementByTestId("modal:open")).shouldNotExist();
+    });
+
+    it("letter shortcuts are ignored in the code editor", () => {
+      when.click("nav:code-editor");
+      then(get.element(".maputnik-code-editor")).shouldExist();
+      when.appendTextInJsonEditor("o");
+      then(get.elementByTestId("modal:open")).shouldNotExist();
     });
   });
 });

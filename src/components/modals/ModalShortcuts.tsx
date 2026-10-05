@@ -1,5 +1,5 @@
 import React from "react";
-import { Trans, type WithTranslation, withTranslation } from "react-i18next";
+import { type WithTranslation, withTranslation } from "react-i18next";
 
 import Modal from "./Modal";
 
@@ -109,9 +109,7 @@ class ModalShortcutsInternal extends React.Component<ModalShortcutsInternalProps
     >
       <section className="maputnik-modal-section maputnik-modal-shortcuts">
         <p>
-          <Trans t={t}>
-            Press <code>ESC</code> to lose focus of any active elements, then press one of:
-          </Trans>
+          {t("Shortcuts work unless you are typing in a text field, dropdown, or code editor. Press one of:")}
         </p>
         <dl>
           {help.map((item, idx) => {

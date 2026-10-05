@@ -157,6 +157,7 @@
   "Decrease the pitch by 10 degrees.": "ピッチを10度減らす",
   "Shortcuts": "ショートカット",
   "Press <1>ESC</1> to lose focus of any active elements, then press one of:": "<1>ESC</1> を押してアクティブな要素からフォーカスを外し、次に以下のいずれかを押してください:",
+  "Shortcuts work unless you are typing in a text field, dropdown, or code editor. Press one of:": "ショートカットは、テキスト欄・ドロップダウン・コードエディタでの入力中を除き利用できます。次のいずれかを押してください:",
   "If the Map is in focused you can use the following shortcuts": "地図がフォーカスされている場合、以下のショートカットを使用できます",
   "Remove '{{sourceId}}' source": "'{{sourceId}}' ソースを削除",
   "Source ID": "ソースID",

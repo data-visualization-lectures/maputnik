@@ -157,6 +157,7 @@
   "Decrease the pitch by 10 degrees.": "הורדה של 10 מעלות מהזווית",
   "Shortcuts": "קיצורי דרך",
   "Press <1>ESC</1> to lose focus of any active elements, then press one of:": "לחיצה על <1>ESC</1> על מנת לאבד פוקוס מכל פקד פעיל, ואז ליחצו על אחד מאלו:",
+  "Shortcuts work unless you are typing in a text field, dropdown, or code editor. Press one of:": "קיצורי הדרך פועלים אלא אם מקלידים בשדה טקסט, ברשימה נפתחת או בעורך קוד. לחצו על אחד מאלו:",
   "If the Map is in focused you can use the following shortcuts": "אם המפה נמצאת בפוקוס תוכלו להשתמש בקיצורי הדרך",
   "Remove '{{sourceId}}' source": "הורדה של מקור '{{sourceId}}'",
   "Source ID": "מזהה מקור",
