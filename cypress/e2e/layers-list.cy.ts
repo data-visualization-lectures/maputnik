@@ -561,7 +561,8 @@ describe("layers list", () => {
       when.setValue("layer-editor.layer-id.input", duplicateId);
       when.click("min-zoom");
 
-      when.dragAndDropWithWait("layer-list-item-handle:0", "layer-list-item-handle:1");
+      when.click("layer-list-group:dup-0");
+      when.reorderLayerWithKeyboard("layer-list-item-handle:0", 1);
 
       then(get.styleFromLocalStorage()).shouldDeepNestedInclude({
         layers: [
