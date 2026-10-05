@@ -12,6 +12,8 @@
 - Upgraded codemirror from version 5 to version 6
 - Add code editor to allow editing the entire style
 - Add support for sprite object in setting modal
+- Add collapsible layer list and editor panels, a map-only mode, and overlay drawers on narrow screens
+- Keep the layer list visible while the style code editor is open, and replace the full-width close control with a compact header
 - _...Add new stuff here..._
 
 ### 🐞 Bug fixes
