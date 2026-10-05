@@ -581,21 +581,6 @@ describe("layers list", () => {
       then(get.elementByTestId("layer-list.no-results")).shouldBeVisible();
     });
 
-    it("keeps grouping when the filter is empty", () => {
-      when.modal.open();
-      when.modal.fillLayers({
-        id: "foo",
-        type: "background",
-      });
-      when.modal.open();
-      when.modal.fillLayers({
-        id: "foo_bar",
-        type: "background",
-      });
-      then(get.elementByTestId("layer-list-item:foo")).shouldBeVisible();
-      then(get.elementByTestId("layer-list-item:foo_bar")).shouldNotBeVisible();
-    });
-
     it("reveals matching layers in collapsed groups", () => {
       when.modal.open();
       when.modal.fillLayers({
@@ -611,6 +596,8 @@ describe("layers list", () => {
       when.setValue("layer-list.search", "foo_bar");
       then(get.elementByTestId("layer-list-item:foo_bar")).shouldBeVisible();
       then(get.elementByTestId("layer-list-item:foo")).shouldNotExist();
+      when.click("layer-list.search.clear");
+      then(get.elementByTestId("layer-list-item:foo_bar")).shouldNotBeVisible();
     });
   });
 
