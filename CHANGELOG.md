@@ -20,6 +20,7 @@
 - Keep the layer list visible while the style code editor is open, and replace the full-width close control with a compact header
 - Collapse overflowing toolbar actions into an accessible More menu on narrow widths, and show icon-only actions with tooltips
 - Add a dedicated Inspect toggle in the toolbar
+- Add a sticky search and type filter to the layer list
 - _...Add new stuff here..._
 
 ### 🐞 Bug fixes
