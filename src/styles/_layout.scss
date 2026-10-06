@@ -15,6 +15,7 @@
 .maputnik-layout {
   font-family: vars.$font-family;
   color: vars.$color-white;
+  --maputnik-chrome-start: #{vars.$layout-rail-width + vars.$layout-list-width + vars.$layout-editor-width};
 
   &-main {
     position: fixed;
@@ -25,34 +26,237 @@
     right: 0;
     z-index: 3;
 
+    display: grid;
+    grid-template-columns: vars.$layout-rail-width vars.$layout-list-width vars.$layout-editor-width minmax(0, 1fr);
+    grid-template-areas: "rail list editor map";
+    transition: grid-template-columns vars.$motion-panel vars.$ease-out;
+  }
+
+  &--list-open:not(&--editor-open) &-main {
+    grid-template-columns: vars.$layout-rail-width vars.$layout-list-width 0 minmax(0, 1fr);
+  }
+
+  &--editor-open:not(&--list-open) &-main {
+    grid-template-columns: vars.$layout-rail-width 0 vars.$layout-editor-width minmax(0, 1fr);
+  }
+
+  &--map-only &-main {
+    grid-template-columns: vars.$layout-rail-width 0 0 minmax(0, 1fr);
+  }
+
+  &-controls {
+    grid-area: rail;
     display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    background-color: vars.$color-black;
+    border-inline-end: solid 1px vars.$color-midgray;
+    z-index: 6;
+
+    &__button {
+      appearance: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: vars.$layout-rail-width;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: vars.$color-lowgray;
+      cursor: pointer;
+      transition: transform 150ms vars.$ease-out, background-color 150ms vars.$ease-out, color 150ms vars.$ease-out;
+
+      @media (hover: hover) and (pointer: fine) {
+        &:hover {
+          background-color: vars.$color-midgray;
+          color: vars.$color-white;
+        }
+      }
+
+      &:active {
+        transform: scale(0.97);
+      }
+
+      &[aria-pressed="true"] {
+        color: vars.$color-white;
+        background-color: vars.$color-gray;
+      }
+    }
   }
 
   &-list {
-    width: 200px;
+    grid-area: list;
+    width: 100%;
+    min-width: 0;
     background-color: vars.$color-black;
+    overflow: hidden;
   }
 
   &-drawer {
-    width: 370px;
+    grid-area: editor;
+    width: 100%;
+    min-width: 0;
     background-color: vars.$color-black;
     // scroll-container is position: absolute
     position: relative;
+    overflow: hidden;
+  }
+
+  &-map {
+    grid-area: map;
+    min-width: 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  &-list:not(&-list--open),
+  &-drawer:not(&-drawer--open) {
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  &-backdrop {
+    appearance: none;
+    position: absolute;
+    inset: 0;
+    inset-inline-start: vars.$layout-rail-width;
+    border: 0;
+    padding: 0;
+    margin: 0;
+    background: rgb(0 0 0 / 40%);
+    z-index: 4;
+    cursor: pointer;
   }
 
   &-code-editor {
-    width: 570px;
+    width: 100%;
     background-color: vars.$color-black;
-    // scroll-container is position: absolute
     position: relative;
   }
 
   &-bottom {
     position: fixed;
     bottom: 0;
-    right: 0;
+    inset-inline-end: 0;
+    inset-inline-start: var(--maputnik-chrome-start);
     z-index: 10;
-    width: vars.$layout-map-width;
+    width: auto;
     background-color: vars.$color-black;
+  }
+}
+
+.maputnik-code-editor-header {
+  display: flex;
+  align-items: center;
+  gap: vars.$margin-2;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  padding: 6px;
+  background-color: vars.$color-black;
+
+  &__title {
+    flex: 1;
+    margin: 0;
+    font-size: vars.$font-size-5;
+    line-height: 24px;
+  }
+
+  &__close {
+    appearance: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: vars.$color-lowgray;
+    cursor: pointer;
+    transition: transform 150ms vars.$ease-out, background-color 150ms vars.$ease-out, color 150ms vars.$ease-out;
+
+    @media (hover: hover) and (pointer: fine) {
+      &:hover {
+        background-color: vars.$color-midgray;
+        color: vars.$color-white;
+      }
+    }
+
+    &:active {
+      transform: scale(0.97);
+    }
+  }
+}
+
+@media screen and (max-width: vars.$layout-overlay-max) {
+  .maputnik-layout {
+    &-main {
+      grid-template-columns: vars.$layout-rail-width minmax(0, 1fr);
+      grid-template-areas: "rail map";
+      transition: none;
+    }
+
+    &--list-open:not(&--editor-open) &-main,
+    &--editor-open:not(&--list-open) &-main,
+    &--map-only &-main {
+      grid-template-columns: vars.$layout-rail-width minmax(0, 1fr);
+    }
+
+    &-list,
+    &-drawer {
+      grid-area: unset;
+      position: absolute;
+      inset-block: 0;
+      inset-inline-start: vars.$layout-rail-width;
+      width: min(100% - #{vars.$layout-rail-width}, #{vars.$layout-editor-width});
+      max-width: calc(100% - #{vars.$layout-rail-width});
+      z-index: 5;
+      visibility: hidden;
+      pointer-events: none;
+      transform: translateX(-100%);
+      transition: transform vars.$motion-panel vars.$ease-drawer, visibility 0ms vars.$motion-panel;
+    }
+
+    &-list {
+      width: min(100% - #{vars.$layout-rail-width}, #{vars.$layout-list-width});
+    }
+
+    &-list--open,
+    &-drawer--open {
+      visibility: visible;
+      pointer-events: auto;
+      transform: translateX(0);
+      transition: transform vars.$motion-panel vars.$ease-drawer, visibility 0ms;
+    }
+
+    &-list:not(&-list--open),
+    &-drawer:not(&-drawer--open) {
+      visibility: hidden;
+      pointer-events: none;
+    }
+  }
+
+  [dir="rtl"] .maputnik-layout {
+    &-list,
+    &-drawer {
+      transform: translateX(100%);
+    }
+
+    &-list--open,
+    &-drawer--open {
+      transform: translateX(0);
+    }
+  }
+}
+
+@media screen and (prefers-reduced-motion: reduce) {
+  .maputnik-layout-main,
+  .maputnik-layout-list,
+  .maputnik-layout-drawer,
+  .maputnik-layout-controls__button,
+  .maputnik-code-editor-header__close {
+    transition-duration: 0ms;
   }
 }

@@ -15,4 +15,10 @@ describe("code editor", () => {
     when.click("nav:code-editor");
     then(get.element(".maputnik-code-editor")).shouldNotExist();
   });
+
+  it("keeps the layer list beside the code editor", () => {
+    when.click("nav:code-editor");
+    then(get.element(".maputnik-code-editor")).shouldExist();
+    then(get.elementByTestId("layer-list")).shouldBeVisible();
+  });
 });

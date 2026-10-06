@@ -16,6 +16,8 @@
 - Add a guided expression builder for common `get`, `match`, `case`, and zoom `interpolate`/`step` patterns, with the JSON editor kept as an Advanced tab
 - Replace icon-only zoom/data/expression conversion buttons with an explicit `fx` menu (`Expression…`, `Data stops`, `Zoom stops`)
 - Allow letter keyboard shortcuts whenever focus is not in a text field, dropdown, or code editor
+- Add collapsible layer list and editor panels, a map-only mode, and overlay drawers on narrow screens
+- Keep the layer list visible while the style code editor is open, and replace the full-width close control with a compact header
 - _...Add new stuff here..._
 
 ### 🐞 Bug fixes
