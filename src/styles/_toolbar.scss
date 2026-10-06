@@ -132,6 +132,10 @@ $toolbar-ease-out: cubic-bezier(0.23, 1, 0.32, 1);
     opacity: 0.45;
     cursor: not-allowed;
     transform: none;
+
+    &:hover {
+      background-color: vars.$color-black;
+    }
   }
 }
 

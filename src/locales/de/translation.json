@@ -274,5 +274,21 @@
   "Open color picker": "Farbwähler öffnen",
   "Close color picker": "Farbwähler schließen",
   "Color picker": "Farbwähler",
-  "Invalid color": "Ungültige Farbe"
+  "Invalid color": "Ungültige Farbe",
+  "Export": "Exportieren",
+  "Undo": "Rückgängig",
+  "Redo": "Wiederholen",
+  "Delete layer": "Ebene löschen",
+  "Duplicate layer": "Ebene duplizieren",
+  "Show layer": "Ebene einblenden",
+  "Hide layer": "Ebene ausblenden",
+  "Delete this layer?": "Diese Ebene löschen?",
+  "This will remove {{layerId}}. You can undo this action afterwards.": "Dadurch wird {{layerId}} entfernt. Die Aktion kann rückgängig gemacht werden.",
+  "No layers yet": "Noch keine Ebenen",
+  "Add a layer to start editing this style.": "Fügen Sie eine Ebene hinzu, um diesen Stil zu bearbeiten.",
+  "open property documentation": "Eigenschaftsdokumentation öffnen",
+  "close property documentation": "Eigenschaftsdokumentation schließen",
+  "Global State modal": "Globaler-Zustand-Modal",
+  "Layer options": "Ebenenoptionen",
+  "Notifications": "Hinweise"
 }

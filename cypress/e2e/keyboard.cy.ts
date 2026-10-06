@@ -58,6 +58,11 @@ describe("keyboard", () => {
       then(get.elementByTestId("modal:debug")).shouldBeVisible();
     });
 
+    it("'g' should show global state modal", () => {
+      when.typeKeys("g");
+      then(get.elementByTestId("modal:global-state")).shouldBeVisible();
+    });
+
     it("letter shortcuts work when a toolbar button is focused", () => {
       when.focus("nav:export");
       then(get.elementByTestId("nav:export")).shouldBeFocused();

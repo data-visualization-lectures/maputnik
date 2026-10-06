@@ -266,5 +266,21 @@
   "Open color picker": "打开颜色选择器",
   "Close color picker": "关闭颜色选择器",
   "Color picker": "颜色选择器",
-  "Invalid color": "无效的颜色"
+  "Invalid color": "无效的颜色",
+  "Export": "导出",
+  "Undo": "撤销",
+  "Redo": "重做",
+  "Delete layer": "删除图层",
+  "Duplicate layer": "复制图层",
+  "Show layer": "显示图层",
+  "Hide layer": "隐藏图层",
+  "Delete this layer?": "删除此图层？",
+  "This will remove {{layerId}}. You can undo this action afterwards.": "这将移除 {{layerId}}。之后可以撤销此操作。",
+  "No layers yet": "还没有图层",
+  "Add a layer to start editing this style.": "添加图层以开始编辑此样式。",
+  "open property documentation": "打开属性说明",
+  "close property documentation": "关闭属性说明",
+  "Global State modal": "全局状态对话框",
+  "Layer options": "图层选项",
+  "Notifications": "通知"
 }

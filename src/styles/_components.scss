@@ -237,6 +237,10 @@
 .maputnik-dialog {
   &__buttons {
     text-align: right;
+
+    .maputnik-button + .maputnik-button {
+      margin-left: vars.$margin-2;
+    }
   }
 }
 

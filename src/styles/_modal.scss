@@ -328,3 +328,40 @@
     margin-left: 4px;
   }
 }
+
+.maputnik-loading {
+  display: flex;
+  align-items: center;
+  gap: vars.$margin-3;
+  margin-bottom: vars.$margin-3;
+
+  p {
+    margin: 0;
+  }
+
+  &__spinner {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    flex: 0 0 18px;
+    border: 2px solid vars.$color-midgray;
+    border-top-color: vars.$color-white;
+    border-radius: 50%;
+    animation: maputnik-spin 0.55s linear infinite;
+  }
+}
+
+@keyframes maputnik-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media screen and (prefers-reduced-motion: reduce) {
+  .maputnik-loading__spinner {
+    animation: none;
+    border-color: vars.$color-lowgray;
+    border-top-color: vars.$color-white;
+    opacity: 0.85;
+  }
+}

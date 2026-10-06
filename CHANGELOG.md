@@ -2,6 +2,7 @@
 
 ### ✨ Features and improvements
 - Added translation to "Links" in debug modal
+- Improve layer list, toolbar, and modal accessibility: always-visible selected/focused layer actions, delete confirmation, Undo/Redo controls, live regions, empty-layer CTA, and Export labeling
 - Add support for hillshade's color arrays and relief-color elevation expression
 - Change layers icons to make them a bit more distinct
 - Remove `@mdi` packages in favor of `react-icons`
@@ -20,6 +21,7 @@
 - Keep the layer list visible while the style code editor is open, and replace the full-width close control with a compact header
 - Collapse overflowing toolbar actions into an accessible More menu on narrow widths, and show icon-only actions with tooltips
 - Add a dedicated Inspect toggle in the toolbar
+- Fix toolbar action overflow using `overflow-y` instead of `overflow-x`
 - Add a sticky search and type filter to the layer list
 - Allow keyboard reordering of layers in the layer list and use unique sortable IDs so duplicate layer IDs do not break drag-and-drop
 - _...Add new stuff here..._

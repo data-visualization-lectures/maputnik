@@ -266,5 +266,21 @@
   "Open color picker": "カラーピッカーを開く",
   "Close color picker": "カラーピッカーを閉じる",
   "Color picker": "カラーピッカー",
-  "Invalid color": "無効な色"
+  "Invalid color": "無効な色",
+  "Export": "書き出し",
+  "Undo": "元に戻す",
+  "Redo": "やり直す",
+  "Delete layer": "レイヤーを削除",
+  "Duplicate layer": "レイヤーを複製",
+  "Show layer": "レイヤーを表示",
+  "Hide layer": "レイヤーを非表示",
+  "Delete this layer?": "このレイヤーを削除しますか？",
+  "This will remove {{layerId}}. You can undo this action afterwards.": "{{layerId}} を削除します。この操作は後から元に戻せます。",
+  "No layers yet": "レイヤーがありません",
+  "Add a layer to start editing this style.": "レイヤーを追加してスタイルの編集を始めましょう。",
+  "open property documentation": "プロパティの説明を開く",
+  "close property documentation": "プロパティの説明を閉じる",
+  "Global State modal": "グローバルステートのモーダル",
+  "Layer options": "レイヤーオプション",
+  "Notifications": "通知"
 }

@@ -12,7 +12,9 @@ import {
   MdSave,
   MdPublic,
   MdCode,
-  MdMoreHoriz
+  MdMoreHoriz,
+  MdUndo,
+  MdRedo
 } from "react-icons/md";
 import pkgJson from "../../package.json";
 //@ts-ignore
@@ -30,6 +32,8 @@ const colorAccessibilityFiltersEnabled = ["chrome", "firefox"].indexOf(browser!.
 const TOOLBAR_ITEM_IDS = [
   "open",
   "export",
+  "undo",
+  "redo",
   "inspect",
   "codeEditor",
   "sources",
@@ -143,6 +147,10 @@ type AppToolbarInternalProps = {
   onSetMapState(mapState: MapState): unknown
   mapState?: MapState
   renderer?: string
+  onUndo(): void
+  onRedo(): void
+  canUndo: boolean
+  canRedo: boolean
 } & WithTranslation;
 
 type AppToolbarInternalState = {
@@ -397,9 +405,31 @@ class AppToolbarInternal extends React.Component<AppToolbarInternalProps, AppToo
           <IconText>{t("Open")}</IconText>
         </ToolbarAction>;
       case "export":
-        return <ToolbarAction wdKey={wd("nav:export")} title={t("Save")} ariaLabel={t("Save")} onClick={() => this.props.onToggleModal("export")}>
+        return <ToolbarAction wdKey={wd("nav:export")} title={t("Export")} ariaLabel={t("Export")} onClick={() => this.props.onToggleModal("export")}>
           <MdSave />
-          <IconText>{t("Save")}</IconText>
+          <IconText>{t("Export")}</IconText>
+        </ToolbarAction>;
+      case "undo":
+        return <ToolbarAction
+          wdKey={wd("nav:undo")}
+          title={t("Undo")}
+          ariaLabel={t("Undo")}
+          disabled={!this.props.canUndo}
+          onClick={() => this.props.onUndo()}
+        >
+          <MdUndo />
+          <IconText>{t("Undo")}</IconText>
+        </ToolbarAction>;
+      case "redo":
+        return <ToolbarAction
+          wdKey={wd("nav:redo")}
+          title={t("Redo")}
+          ariaLabel={t("Redo")}
+          disabled={!this.props.canRedo}
+          onClick={() => this.props.onRedo()}
+        >
+          <MdRedo />
+          <IconText>{t("Redo")}</IconText>
         </ToolbarAction>;
       case "inspect":
         return <ToolbarAction

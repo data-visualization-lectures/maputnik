@@ -21,10 +21,9 @@ import {
 
 import LayerListGroup from "./LayerListGroup";
 import LayerListItem from "./LayerListItem";
-import ModalAdd from "./modals/ModalAdd";
+import EmptyLayersState from "./EmptyLayersState";
 
 import type {LayerSpecification, SourceSpecification} from "maplibre-gl";
-import generateUniqueId from "../libs/document-uid";
 import { findClosestCommonPrefix, layerPrefix, layerIdFromSortableId, layerIndexFromSortableId, uniqueLayerListId, uniqueLayerListIds } from "../libs/layer";
 import { type WithTranslation, withTranslation, useTranslation } from "react-i18next";
 import { type MappedError, type OnMoveLayerCallback } from "../libs/definitions";
@@ -51,6 +50,7 @@ type LayerListContainerProps = {
   onLayerDestroy?(...args: unknown[]): unknown
   onLayerCopy(...args: unknown[]): unknown
   onLayerVisibilityToggle(...args: unknown[]): unknown
+  onOpenAddLayer(): void
   sources: Record<string, SourceSpecification & {layers: string[]}>;
   errors: MappedError[]
 };
@@ -59,8 +59,6 @@ type LayerListContainerInternalProps = LayerListContainerProps & WithTranslation
 type LayerListContainerState = {
   collapsedGroups: {[key: string]: boolean}
   areAllGroupsExpanded: boolean
-  keys: {[key: string]: number}
-  isOpen: {[key: string]: boolean}
   searchQuery: string
   selectedType: string
 };
@@ -84,28 +82,9 @@ class LayerListContainerInternal extends React.Component<LayerListContainerInter
     this.state = {
       collapsedGroups: {},
       areAllGroupsExpanded: false,
-      keys: {
-        add: +generateUniqueId(),
-      },
-      isOpen: {
-        add: false,
-      },
       searchQuery: "",
       selectedType: "",
     };
-  }
-
-  toggleModal(modalName: string) {
-    this.setState({
-      keys: {
-        ...this.state.keys,
-        [modalName]: +generateUniqueId(),
-      },
-      isOpen: {
-        ...this.state.isOpen,
-        [modalName]: !this.state.isOpen[modalName]
-      }
-    });
   }
 
   toggleLayers = () => {
@@ -388,14 +367,6 @@ class LayerListContainerInternal extends React.Component<LayerListContainerInter
       aria-label={t("Layers list")}
       ref={this.scrollContainerRef}
     >
-      <ModalAdd
-        key={this.state.keys.add}
-        layers={this.props.layers}
-        sources={this.props.sources}
-        isOpen={this.state.isOpen.add}
-        onOpenToggle={this.toggleModal.bind(this, "add")}
-        onLayersChange={this.props.onLayersChange}
-      />
       <header className="maputnik-layer-list-header" data-wd-key="layer-list.header">
         <div className="maputnik-layer-list-header-row">
           <span className="maputnik-layer-list-header-title">{t("Layers")}</span>
@@ -418,7 +389,7 @@ class LayerListContainerInternal extends React.Component<LayerListContainerInter
           <div className="maputnik-default-property">
             <div className="maputnik-multibutton">
               <button
-                onClick={this.toggleModal.bind(this, "add")}
+                onClick={this.props.onOpenAddLayer}
                 data-wd-key="layer-list:add-layer"
                 className="maputnik-button maputnik-button-selected">
                 {t("Add Layer")}
@@ -494,6 +465,13 @@ class LayerListContainerInternal extends React.Component<LayerListContainerInter
         <ul className="maputnik-layer-list-container">
           {listItems}
         </ul>
+        {this.props.layers.length === 0 &&
+          <EmptyLayersState
+            wdKey="layer-list:empty"
+            addLayerWdKey="layer-list:empty-add-layer"
+            onAddLayer={this.props.onOpenAddLayer}
+          />
+        }
         {isFiltering && matchCount === 0 ? (
           <p
             className="maputnik-layer-list-empty"

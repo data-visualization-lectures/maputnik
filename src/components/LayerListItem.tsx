@@ -4,6 +4,7 @@ import {MdContentCopy, MdVisibility, MdVisibilityOff, MdDelete} from "react-icon
 import { IconContext } from "react-icons";
 import {useSortable} from "@dnd-kit/sortable";
 import {CSS} from "@dnd-kit/utilities";
+import { useTranslation } from "react-i18next";
 
 import IconLayer from "./IconLayer";
 import { useTranslation } from "react-i18next";
@@ -32,7 +33,7 @@ const DraggableLabel: React.FC<DraggableLabelProps> = (props) => {
       type={props.layerType}
       style={{ width: "1em", height: "1em", verticalAlign: "middle" }}
     />
-    <button className="maputnik-layer-list-item-id">
+    <button type="button" className="maputnik-layer-list-item-id">
       {props.layerId}
     </button>
   </div>;
@@ -40,7 +41,8 @@ const DraggableLabel: React.FC<DraggableLabelProps> = (props) => {
 
 type IconActionProps = {
   action: string
-  onClick(...args: unknown[]): unknown
+  label: string
+  onClick(event: React.MouseEvent<HTMLButtonElement>): void
   wdKey?: string
   classBlockName?: string
   classBlockModifier?: string
@@ -69,12 +71,12 @@ class IconAction extends React.Component<IconActionProps> {
     }
 
     return <button
-      tabIndex={-1}
-      title={this.props.action}
+      type="button"
+      title={this.props.label}
+      aria-label={this.props.label}
       className={`maputnik-layer-list-icon-action ${classAdditions}`}
       data-wd-key={this.props.wdKey}
       onClick={this.props.onClick}
-      aria-hidden="true"
     >
       {this.renderIcon()}
     </button>;
@@ -97,6 +99,7 @@ type LayerListItemProps = {
 };
 
 const LayerListItem = React.forwardRef<HTMLLIElement, LayerListItemProps>((props, ref) => {
+  const { t } = useTranslation();
   const {
     isSelected = false,
     visibility = "visible",
@@ -121,9 +124,16 @@ const LayerListItem = React.forwardRef<HTMLLIElement, LayerListItemProps>((props
   };
 
   const visibilityAction = visibility === "visible" ? "show" : "hide";
+  const visibilityLabel = visibility === "visible" ? t("Hide layer") : t("Show layer");
 
   // Cast ref to MutableRefObject since we know from the codebase that's what's always passed
   const refObject = ref as React.MutableRefObject<HTMLLIElement | null> | null;
+
+  const handleActionClick = (event: React.MouseEvent, handler: () => void) => {
+    event.preventDefault();
+    event.stopPropagation();
+    handler();
+  };
 
   return <IconContext.Provider value={{size: "14px"}}>
     <li
@@ -153,21 +163,24 @@ const LayerListItem = React.forwardRef<HTMLLIElement, LayerListItemProps>((props
       <IconAction
         wdKey={"layer-list-item:" + props.layerId+":delete"}
         action={"delete"}
+        label={t("Delete layer")}
         classBlockName="delete"
-        onClick={_e => onLayerDestroy!(props.layerIndex)}
+        onClick={e => handleActionClick(e, () => onLayerDestroy!(props.layerIndex))}
       />
       <IconAction
         wdKey={"layer-list-item:" + props.layerId+":copy"}
         action={"duplicate"}
+        label={t("Duplicate layer")}
         classBlockName="duplicate"
-        onClick={_e => onLayerCopy!(props.layerIndex)}
+        onClick={e => handleActionClick(e, () => onLayerCopy!(props.layerIndex))}
       />
       <IconAction
         wdKey={"layer-list-item:"+props.layerId+":toggle-visibility"}
         action={visibilityAction}
+        label={visibilityLabel}
         classBlockName="visibility"
         classBlockModifier={visibilityAction}
-        onClick={_e => onLayerVisibilityToggle!(props.layerIndex)}
+        onClick={e => handleActionClick(e, () => onLayerVisibilityToggle!(props.layerIndex))}
       />
     </li>
   </IconContext.Provider>;

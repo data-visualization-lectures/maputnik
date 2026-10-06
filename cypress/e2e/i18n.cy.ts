@@ -30,6 +30,8 @@ describe("i18n", () => {
       then(get.elementByTestId(selector)).shouldHaveValue("ja");
 
       then(get.elementByTestId("nav:settings")).shouldHaveText("スタイル設定");
+      then(get.elementByTestId("nav:export")).shouldHaveText("書き出し");
+      then(get.elementByTestId("nav:language")).shouldContainText("言語");
     });
   });
 });

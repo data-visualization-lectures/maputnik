@@ -266,5 +266,21 @@
   "Open color picker": "Ouvrir le sélecteur de couleur",
   "Close color picker": "Fermer le sélecteur de couleur",
   "Color picker": "Sélecteur de couleur",
-  "Invalid color": "Couleur invalide"
+  "Invalid color": "Couleur invalide",
+  "Export": "Exporter",
+  "Undo": "Annuler",
+  "Redo": "Rétablir",
+  "Delete layer": "Supprimer le calque",
+  "Duplicate layer": "Dupliquer le calque",
+  "Show layer": "Afficher le calque",
+  "Hide layer": "Masquer le calque",
+  "Delete this layer?": "Supprimer ce calque ?",
+  "This will remove {{layerId}}. You can undo this action afterwards.": "Cela supprimera {{layerId}}. Vous pourrez annuler cette action ensuite.",
+  "No layers yet": "Aucun calque pour le moment",
+  "Add a layer to start editing this style.": "Ajoutez un calque pour commencer à modifier ce style.",
+  "open property documentation": "Ouvrir la documentation de la propriété",
+  "close property documentation": "Fermer la documentation de la propriété",
+  "Global State modal": "Modale État global",
+  "Layer options": "Options du calque",
+  "Notifications": "Notifications"
 }

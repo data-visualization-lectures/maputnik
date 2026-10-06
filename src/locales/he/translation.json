@@ -266,5 +266,21 @@
   "Open color picker": "פתח בוחר צבע",
   "Close color picker": "סגור בוחר צבע",
   "Color picker": "בוחר צבע",
-  "Invalid color": "צבע לא חוקי"
+  "Invalid color": "צבע לא חוקי",
+  "Export": "ייצוא",
+  "Undo": "ביטול",
+  "Redo": "ביצוע חוזר",
+  "Delete layer": "מחיקת שכבה",
+  "Duplicate layer": "שכפול שכבה",
+  "Show layer": "הצגת שכבה",
+  "Hide layer": "הסתרת שכבה",
+  "Delete this layer?": "למחוק את השכבה?",
+  "This will remove {{layerId}}. You can undo this action afterwards.": "פעולה זו תסיר את {{layerId}}. ניתן לבטל לאחר מכן.",
+  "No layers yet": "אין עדיין שכבות",
+  "Add a layer to start editing this style.": "הוסיפו שכבה כדי להתחיל לערוך את הסטייל.",
+  "open property documentation": "פתיחת תיעוד המאפיין",
+  "close property documentation": "סגירת תיעוד המאפיין",
+  "Global State modal": "חלונית מצב גלובלי",
+  "Layer options": "אפשרויות שכבה",
+  "Notifications": "הודעות"
 }
