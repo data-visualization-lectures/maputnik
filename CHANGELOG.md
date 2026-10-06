@@ -21,6 +21,7 @@
 - Collapse overflowing toolbar actions into an accessible More menu on narrow widths, and show icon-only actions with tooltips
 - Add a dedicated Inspect toggle in the toolbar
 - Add a sticky search and type filter to the layer list
+- Allow keyboard reordering of layers in the layer list and use unique sortable IDs so duplicate layer IDs do not break drag-and-drop
 - _...Add new stuff here..._
 
 ### 🐞 Bug fixes

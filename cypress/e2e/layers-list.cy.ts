@@ -514,6 +514,77 @@ describe("layers list", () => {
         ],
       });
     });
+
+    it("move layer with keyboard should update local storage", () => {
+      when.modal.open();
+      const firstId = when.modal.fillLayers({
+        id: "a",
+        type: "background",
+      });
+      when.modal.open();
+      const secondId = when.modal.fillLayers({
+        id: "b",
+        type: "background",
+      });
+
+      when.reorderLayerWithKeyboard("layer-list-item-handle:0", 1);
+
+      then(get.styleFromLocalStorage()).shouldDeepNestedInclude({
+        layers: [
+          {
+            id: secondId,
+            type: "background",
+          },
+          {
+            id: firstId,
+            type: "background",
+          },
+        ],
+      });
+    });
+
+    it("should reorder layers that share a duplicate id", () => {
+      when.modal.open();
+      const duplicateId = when.modal.fillLayers({
+        id: "dup",
+        type: "background",
+      });
+      when.modal.open();
+      const secondId = when.modal.fillLayers({
+        id: "other",
+        type: "background",
+      });
+
+      when.click("layer-list-item:" + secondId);
+      when.setValue("min-zoom.input-text", "2");
+      when.click("layer-editor.layer-id");
+      when.setValue("layer-editor.layer-id.input", duplicateId);
+      when.click("min-zoom");
+
+      when.click("layer-list-group:dup-0");
+      when.reorderLayerWithKeyboard("layer-list-item-handle:0", 1);
+
+      then(get.styleFromLocalStorage()).shouldDeepNestedInclude({
+        layers: [
+          {
+            id: duplicateId,
+            type: "background",
+            minzoom: 2,
+          },
+          {
+            id: duplicateId,
+            type: "background",
+          },
+        ],
+      });
+    });
+
+    it("should expose translated keyboard sorting instructions", () => {
+      cy.get("[id^='DndDescribedBy']").should(
+        "contain.text",
+        "To pick up a layer, press the space bar"
+      );
+    });
   });
 
   describe("search and filter", () => {

@@ -76,6 +76,38 @@ export function layerPrefix(name: string) {
   return name.replace(" ", "-").replace("_", "-").split("-")[0];
 }
 
+/**
+ * Sortable/list row id that stays unique even when `layer.id` is duplicated.
+ * Occurrence is 0-based in list order (first "foo" → 0, second "foo" → 1).
+ */
+export function uniqueLayerListId(layerId: string, occurrence: number): string {
+  return `layers-list-${layerId}-${occurrence}`;
+}
+
+export function uniqueLayerListIds(layers: {id: string}[]): string[] {
+  const seen = new Map<string, number>();
+  return layers.map((layer) => {
+    const occurrence = seen.get(layer.id) ?? 0;
+    seen.set(layer.id, occurrence + 1);
+    return uniqueLayerListId(layer.id, occurrence);
+  });
+}
+
+export function layerIndexFromSortableId(
+  layers: {id: string}[],
+  sortableId: string | number
+): number {
+  return uniqueLayerListIds(layers).indexOf(String(sortableId));
+}
+
+export function layerIdFromSortableId(
+  layers: {id: string}[],
+  sortableId: string | number
+): string {
+  const index = layerIndexFromSortableId(layers, sortableId);
+  return index === -1 ? String(sortableId) : layers[index].id;
+}
+
 export function findClosestCommonPrefix(layers: LayerSpecification[], idx: number) {
   const currentLayerPrefix = layerPrefix(layers[idx].id);
   let closestIdx = idx;
