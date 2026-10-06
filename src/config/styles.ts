@@ -1,4 +1,5 @@
 import { tokens } from "./tokens";
+import { PROTOMAPS_GALLERY_STYLE_PATH } from "../libs/protomaps-proxy";
 
 const mapTilerKey = tokens.openmaptiles;
 
@@ -78,7 +79,7 @@ export const styles = [
     {
         "id": "protomaps-light",
         "title": "Protomaps Light",
-        "url": "https://api.protomaps.com/styles/v4/light/en.json?key=d828297496b11844",
+        "url": PROTOMAPS_GALLERY_STYLE_PATH,
         "thumbnail": "https://github.com/user-attachments/assets/911f9765-4a7d-4736-9ec0-f2d4c90ae587"
     },
     {

@@ -28,6 +28,8 @@
 
 ### 🐞 Bug fixes
 
+- Load the Protomaps Light gallery style from a same-origin snapshot and proxy `api.protomaps.com` so production no longer fails CORS when opening a gallery style
+- Remove a duplicate `useTranslation` import that crashed the Vite dev build of the layer list
 - Fixed the Expression editor (for long expressions) being able to be float under other components further down
 - Fixed an issue when clicking on a popup and then clicking on the map again
 - Fix modal close button possition

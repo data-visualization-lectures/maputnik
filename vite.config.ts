@@ -3,9 +3,16 @@ import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 import istanbul from "vite-plugin-istanbul";
 
-export default defineConfig(({ mode }) => ({
+export default defineConfig(({ mode: _mode }) => ({
   server: {
     port: 8888,
+    proxy: {
+      "/api/protomaps": {
+        target: "https://api.protomaps.com",
+        changeOrigin: true,
+        rewrite: (proxyPath: string) => proxyPath.replace(/^\/api\/protomaps/, ""),
+      },
+    },
   },
   build: {
     sourcemap: true

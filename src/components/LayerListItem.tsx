@@ -7,8 +7,6 @@ import {CSS} from "@dnd-kit/utilities";
 import { useTranslation } from "react-i18next";
 
 import IconLayer from "./IconLayer";
-import { useTranslation } from "react-i18next";
-
 
 type DraggableLabelProps = {
   layerId: string
