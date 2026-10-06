@@ -38,6 +38,7 @@ import { tokens } from "../config/tokens";
 import isEqual from "lodash.isequal";
 import { type MapOptions } from "maplibre-gl";
 import { type MappedError, type OnStyleChangedOpts, type StyleSpecificationWithId } from "../libs/definitions";
+import { isLetterShortcutBlocked, isModifierUndoBlocked } from "../libs/keyboard";
 
 // Buffer must be defined globally for @maplibre/maplibre-gl-style-spec validate() function to succeed.
 window.Buffer = buffer.Buffer;
@@ -239,8 +240,16 @@ export default class App extends React.Component<any, AppState> {
       if (e.key === "Escape") {
         (e.target as HTMLElement).blur();
         document.body.focus();
+        return;
       }
-      else if (this.state.isOpen.shortcuts || document.activeElement === document.body) {
+
+      // Letter shortcuts are unmodified; modifier chords are handled in handleKeyPress.
+      if (e.ctrlKey || e.metaKey || e.altKey) {
+        return;
+      }
+
+      const blocked = isLetterShortcutBlocked(e.target) || isLetterShortcutBlocked(document.activeElement);
+      if (this.state.isOpen.shortcuts || !blocked) {
         const shortcut = shortcuts.find((shortcut) => {
           return (shortcut.key === e.key);
         });
@@ -254,6 +263,10 @@ export default class App extends React.Component<any, AppState> {
   };
 
   handleKeyPress = (e: KeyboardEvent) => {
+    if (isModifierUndoBlocked(e.target) || isModifierUndoBlocked(document.activeElement)) {
+      return;
+    }
+
     if (navigator.platform.toUpperCase().indexOf("MAC") >= 0) {
       if (e.metaKey && e.shiftKey && e.keyCode === 90) {
         e.preventDefault();

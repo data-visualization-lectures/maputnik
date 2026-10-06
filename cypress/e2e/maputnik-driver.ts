@@ -166,6 +166,18 @@ export class MaputnikDriver {
 
     typeKeys: (keys: string) => this.helper.get.element("body").type(keys),
 
+    typeKeysOn: (testId: string, keys: string) => {
+      this.helper.get.elementByTestId(testId).focus().type(keys);
+    },
+
+    keyupOn: (testId: string, key: string) => {
+      this.helper.get.elementByTestId(testId).focus().then(($el) => {
+        const node = $el[0];
+        const KeyboardEventCtor = node.ownerDocument.defaultView!.KeyboardEvent;
+        node.dispatchEvent(new KeyboardEventCtor("keyup", { key, bubbles: true }));
+      });
+    },
+
     clickZoomIn: () => {
       this.helper.get.element(".maplibregl-ctrl-zoom-in").click();
     },

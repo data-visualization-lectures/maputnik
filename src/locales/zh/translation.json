@@ -187,6 +187,7 @@
   "Decrease the pitch by 10 degrees.": "将俯仰角减少10度。",
   "Shortcuts": "快捷键",
   "Press <1>ESC</1> to lose focus of any active elements, then press one of:": "按下 <1>ESC</1> 退出任何活动元素的焦点，然后按下以下之一：",
+  "Shortcuts work unless you are typing in a text field, dropdown, or code editor. Press one of:": "快捷键在文本框、下拉菜单或代码编辑器中输入时会被忽略。请按以下任一键：",
   "If the Map is in focused you can use the following shortcuts": "如果地图处于焦点状态，您可以使用以下快捷键",
   "Remove '{{sourceId}}' source": "移除 '{{sourceId}}' 源",
   "Source ID": "源ID",
