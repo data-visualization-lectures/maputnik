@@ -10,11 +10,13 @@ import InputUrl from "../InputUrl";
 
 import style from "../../libs/style";
 import { styles as publicStyles } from "../../config/styles";
+import { fetchStyleJson } from "../../libs/protomaps-proxy";
 
 type PublicStyleProps = {
   url: string
   thumbnailUrl: string
   title: string
+  "data-wd-key"?: string
   onSelect(...args: unknown[]): unknown
 };
 
@@ -24,6 +26,7 @@ class PublicStyle extends React.Component<PublicStyleProps> {
       <InputButton
         className="maputnik-public-style-button"
         aria-label={this.props.title}
+        data-wd-key={this.props["data-wd-key"]}
         onClick={() => this.props.onSelect(this.props.url)}
       >
         <div className="maputnik-public-style-header">
@@ -88,13 +91,7 @@ class ModalOpenInternal extends React.Component<ModalOpenInternalProps, ModalOpe
 
     let canceled: boolean = false;
 
-    fetch(styleUrl, {
-      mode: "cors",
-      credentials: "same-origin"
-    })
-      .then(function (response) {
-        return response.json();
-      })
+    fetchStyleJson(styleUrl)
       .then((body) => {
         if (canceled) {
           return;
@@ -105,7 +102,7 @@ class ModalOpenInternal extends React.Component<ModalOpenInternalProps, ModalOpe
           activeRequestUrl: null
         });
 
-        const mapStyle = style.ensureStyleValidity(body);
+        const mapStyle = style.ensureStyleValidity(body as Parameters<typeof style.ensureStyleValidity>[0]);
         console.log("Loaded style ", mapStyle.id);
         this.props.onStyleOpen(mapStyle);
         this.onOpenToggle();
@@ -218,6 +215,7 @@ class ModalOpenInternal extends React.Component<ModalOpenInternalProps, ModalOpe
         url={style.url}
         title={style.title}
         thumbnailUrl={style.thumbnail}
+        data-wd-key={`modal:open.gallery.${style.id}`}
         onSelect={this.onStyleSelect}
       />;
     });

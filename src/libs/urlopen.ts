@@ -1,5 +1,6 @@
 import style from "./style";
 import { type StyleSpecificationWithId } from "./definitions";
+import { fetchStyleJson } from "./protomaps-proxy";
 
 export function getStyleUrlFromAddressbarAndRemoveItIfNeeded(): string | null {
   const initialUrl = new URL(window.location.href);
@@ -14,12 +15,8 @@ export function getStyleUrlFromAddressbarAndRemoveItIfNeeded(): string | null {
 export async function loadStyleUrl(styleUrl: string): Promise<StyleSpecificationWithId> {
   console.log("Loading style", styleUrl);
   try {
-    const response = await fetch(styleUrl, {
-      mode: "cors",
-      credentials: "same-origin"
-    });
-    const body = await response.json();
-    return style.ensureStyleValidity(body);
+    const body = await fetchStyleJson(styleUrl);
+    return style.ensureStyleValidity(body as Parameters<typeof style.ensureStyleValidity>[0]);
   } catch {
     console.warn("Could not fetch default style: " + styleUrl);
     return style.emptyStyle;

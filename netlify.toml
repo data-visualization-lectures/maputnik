@@ -3,6 +3,13 @@
   publish = "dist"
 
 [[redirects]]
+  from = "/api/protomaps/*"
+  to = "https://api.protomaps.com/:splat"
+  status = 200
+  force = true
+  headers = {Origin = "https://maputnik.dataviz.jp"}
+
+[[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200

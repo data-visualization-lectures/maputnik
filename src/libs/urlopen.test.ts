@@ -1,5 +1,6 @@
-import { describe, it, expect, beforeEach, afterEach } from "vitest";
-import { validate, ErrorType } from "./urlopen";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+import { validate, ErrorType, loadStyleUrl } from "./urlopen";
+import { PROTOMAPS_GALLERY_STYLE_PATH, PROTOMAPS_PMTILES_URL } from "./protomaps-proxy";
 
 // Mock window.location if not in browser environment
 const mockLocation = {
@@ -149,5 +150,51 @@ describe("validate", () => {
       expect(validate("http://LOCALHOST")).toBe(ErrorType.None);
       expect(validate("http://LocalHost:3000")).toBe(ErrorType.None);
     });
+  });
+});
+
+describe("loadStyleUrl", () => {
+  const originalFetch = globalThis.fetch;
+
+  beforeEach(() => {
+    globalThis.fetch = vi.fn();
+  });
+
+  afterEach(() => {
+    globalThis.fetch = originalFetch;
+    vi.restoreAllMocks();
+  });
+
+  it("rewrites a Protomaps API style onto the same-origin gallery fallback", async () => {
+    vi.mocked(globalThis.fetch)
+      .mockResolvedValueOnce({ ok: false, status: 403 } as Response)
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          version: 8,
+          name: "Protomaps Light",
+          sources: {
+            protomaps: {
+              type: "vector",
+              tiles: ["https://api.protomaps.com/tiles/v4/{z}/{x}/{y}.mvt?key=test-key"],
+            },
+          },
+          layers: [],
+        }),
+      } as Response);
+
+    const mapStyle = await loadStyleUrl("https://api.protomaps.com/styles/v4/light/en.json?key=test-key");
+
+    expect(vi.mocked(globalThis.fetch).mock.calls[1][0]).toBe(PROTOMAPS_GALLERY_STYLE_PATH);
+    expect(mapStyle.sources.protomaps).toMatchObject({ url: PROTOMAPS_PMTILES_URL });
+    expect(mapStyle.id).toBeTruthy();
+  });
+
+  it("returns the empty style when every fetch candidate fails", async () => {
+    vi.mocked(globalThis.fetch).mockRejectedValue(new TypeError("Failed to fetch"));
+
+    const mapStyle = await loadStyleUrl("https://example.com/missing.json");
+    expect(mapStyle.layers).toEqual([]);
+    expect(mapStyle.sources).toEqual({});
   });
 });
