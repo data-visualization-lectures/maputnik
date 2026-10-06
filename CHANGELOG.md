@@ -18,6 +18,8 @@
 - Allow letter keyboard shortcuts whenever focus is not in a text field, dropdown, or code editor
 - Add collapsible layer list and editor panels, a map-only mode, and overlay drawers on narrow screens
 - Keep the layer list visible while the style code editor is open, and replace the full-width close control with a compact header
+- Collapse overflowing toolbar actions into an accessible More menu on narrow widths, and show icon-only actions with tooltips
+- Add a dedicated Inspect toggle in the toolbar
 - _...Add new stuff here..._
 
 ### 🐞 Bug fixes
@@ -31,6 +33,7 @@
 - Fix issue with missing bottom error panel
 - Fixed headers in left panes (Layers list and Layer editor) to remain visible when scrolling
 - Fix error when using a source from localhost
+- Fix toolbar action overflow using `overflow-y` instead of `overflow-x`
 - _...Add new stuff here..._
 
 ## 3.0.0
