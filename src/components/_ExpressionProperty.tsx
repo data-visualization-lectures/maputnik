@@ -6,9 +6,12 @@ import Block from "./Block";
 import InputButton from "./InputButton";
 import labelFromFieldName from "../libs/label-from-field-name";
 import FieldJson from "./FieldJson";
+import ExpressionBuilder from "./ExpressionBuilder";
+import {detectExpressionPattern, isGuidedExpressionPattern} from "../libs/expression-builder";
 import type { StylePropertySpecification } from "maplibre-gl";
 import { type MappedLayerErrors } from "../libs/definitions";
 
+type ExpressionEditorTab = "builder" | "advanced";
 
 type ExpressionPropertyInternalProps = {
   fieldName: string
@@ -24,7 +27,15 @@ type ExpressionPropertyInternalProps = {
   onBlur?(...args: unknown[]): unknown
 } & WithTranslation;
 
-class ExpressionPropertyInternal extends React.Component<ExpressionPropertyInternalProps> {
+type ExpressionPropertyState = {
+  tab: ExpressionEditorTab
+};
+
+function initialTab(value: unknown): ExpressionEditorTab {
+  return isGuidedExpressionPattern(detectExpressionPattern(value)) ? "builder" : "advanced";
+}
+
+class ExpressionPropertyInternal extends React.Component<ExpressionPropertyInternalProps, ExpressionPropertyState> {
   static defaultProps = {
     errors: {},
     onFocus: () => {},
@@ -34,13 +45,20 @@ class ExpressionPropertyInternal extends React.Component<ExpressionPropertyInter
   constructor(props: ExpressionPropertyInternalProps) {
     super(props);
     this.state = {
-      jsonError: false,
+      tab: initialTab(props.value),
     };
   }
 
+  setTab = (tab: ExpressionEditorTab) => {
+    this.setState({tab});
+  };
+
   render() {
     const {t, value, canUndo} = this.props;
-    const undoDisabled = canUndo ? !canUndo() : true;
+    const undoAvailable = canUndo ? canUndo() : false;
+    const undoDisabled = !undoAvailable;
+    const pattern = detectExpressionPattern(value);
+    const guided = isGuidedExpressionPattern(pattern);
 
     const deleteStopBtn = (
       <>
@@ -50,7 +68,8 @@ class ExpressionPropertyInternal extends React.Component<ExpressionPropertyInter
             onClick={this.props.onUndo}
             disabled={undoDisabled}
             className="maputnik-delete-stop"
-            title={t("Revert from expression")}
+            title={undoAvailable ? t("Revert from expression") : t("Revert is only available for get or literal expressions")}
+            aria-label={undoAvailable ? t("Revert from expression") : t("Revert is only available for get or literal expressions")}
           >
             <MdUndo />
           </InputButton>
@@ -60,6 +79,7 @@ class ExpressionPropertyInternal extends React.Component<ExpressionPropertyInter
           onClick={this.props.onDelete}
           className="maputnik-delete-stop"
           title={t("Delete expression")}
+          aria-label={t("Delete expression")}
         >
           <MdDelete />
         </InputButton>
@@ -77,15 +97,52 @@ class ExpressionPropertyInternal extends React.Component<ExpressionPropertyInter
       wideMode={true}
       error={error}
     >
-      <FieldJson
-        lintType="expression"
-        spec={this.props.fieldSpec}
-        className="maputnik-expression-editor"
-        onFocus={this.props.onFocus}
-        onBlur={this.props.onBlur}
-        value={value}
-        onChange={this.props.onChange}
-      />
+      <div className="maputnik-expression-editor-shell">
+        <div className="maputnik-expression-tabs" role="tablist" aria-label={t("Expression editor")}>
+          <InputButton
+            className={this.state.tab === "builder" ? "maputnik-button-selected" : undefined}
+            data-wd-key="expression-editor-tab:builder"
+            aria-label={t("Builder")}
+            onClick={() => this.setTab("builder")}
+          >
+            {t("Builder")}
+          </InputButton>
+          <InputButton
+            className={this.state.tab === "advanced" ? "maputnik-button-selected" : undefined}
+            data-wd-key="expression-editor-tab:advanced"
+            aria-label={t("Advanced")}
+            onClick={() => this.setTab("advanced")}
+          >
+            {t("Advanced")}
+          </InputButton>
+        </div>
+        {this.state.tab === "builder" &&
+          <ExpressionBuilder
+            value={value}
+            fieldName={this.props.fieldName}
+            fieldSpec={this.props.fieldSpec}
+            onChange={this.props.onChange}
+          />
+        }
+        {this.state.tab === "advanced" &&
+          <>
+            {!guided &&
+              <p className="maputnik-expression-builder__hint">
+                {t("This expression is not supported by the guided builder. Edit it as JSON.")}
+              </p>
+            }
+            <FieldJson
+              lintType="expression"
+              spec={this.props.fieldSpec}
+              className="maputnik-expression-editor"
+              onFocus={this.props.onFocus}
+              onBlur={this.props.onBlur}
+              value={value}
+              onChange={this.props.onChange}
+            />
+          </>
+        }
+      </div>
     </Block>;
   }
 }

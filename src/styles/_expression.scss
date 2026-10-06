@@ -1,0 +1,134 @@
+@use "vars";
+@use "sass:color";
+
+.maputnik-expression-editor-shell {
+  display: flex;
+  flex-direction: column;
+  gap: vars.$margin-2;
+  min-width: 0;
+}
+
+.maputnik-expression-tabs {
+  display: flex;
+  gap: vars.$margin-1;
+
+  .maputnik-button {
+    padding: 2px vars.$margin-2;
+  }
+}
+
+.maputnik-expression-builder {
+  display: flex;
+  flex-direction: column;
+  gap: vars.$margin-2;
+  min-width: 0;
+}
+
+.maputnik-expression-builder__field {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+
+  > span {
+    color: vars.$color-lowgray;
+    font-size: vars.$font-size-6;
+  }
+}
+
+.maputnik-expression-builder__hint,
+.maputnik-expression-builder__unsupported p {
+  margin: 0;
+  color: vars.$color-lowgray;
+  font-size: vars.$font-size-6;
+  line-height: 1.4;
+}
+
+.maputnik-expression-builder__rows {
+  display: flex;
+  flex-direction: column;
+  gap: vars.$margin-2;
+}
+
+.maputnik-expression-builder__row {
+  display: grid;
+  grid-template-columns: minmax(3.5em, 5.5em) minmax(0, 1fr) 1.6em;
+  gap: vars.$margin-1;
+  align-items: start;
+
+  &--case {
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr) 1.6em;
+  }
+
+  .maputnik-delete-stop {
+    justify-self: end;
+    padding: 0;
+  }
+}
+
+.maputnik-expression-json--invalid {
+  border: solid 1px vars.$color-red;
+}
+
+.maputnik-function-menu {
+  position: relative;
+  display: inline-block;
+  vertical-align: middle;
+
+  &__button {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    white-space: nowrap;
+  }
+
+  &__label {
+    font-size: vars.$font-size-6;
+    font-family: vars.$font-family;
+  }
+
+  &__menu {
+    position: absolute;
+    z-index: 9999;
+    right: 0;
+    min-width: 148px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    background: vars.$color-black;
+    border: solid 1px vars.$color-midgray;
+  }
+
+  [dir="rtl"] &__menu {
+    left: 0;
+    right: auto;
+  }
+
+  &__item {
+    display: flex;
+    align-items: center;
+    gap: vars.$margin-2;
+    padding: vars.$margin-2;
+    color: vars.$color-lowgray;
+    cursor: pointer;
+    font-size: vars.$font-size-6;
+
+    &:hover,
+    &:focus {
+      background: vars.$color-midgray;
+      color: vars.$color-white;
+    }
+  }
+}
+
+.maputnik-make-elevation-function {
+  background-color: transparent;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  vertical-align: middle;
+  padding: 0 vars.$margin-2 0 0;
+  white-space: nowrap;
+
+  @extend .maputnik-icon-button !optional; /* stylelint-disable-line */
+}

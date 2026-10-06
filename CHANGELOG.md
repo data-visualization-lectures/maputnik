@@ -13,6 +13,8 @@
 - Add code editor to allow editing the entire style
 - Add support for sprite object in setting modal
 - Improve color picker UX: inline validation with last valid swatch, accessible swatch button, and Escape/outside-click dismiss
+- Add a guided expression builder for common `get`, `match`, `case`, and zoom `interpolate`/`step` patterns, with the JSON editor kept as an Advanced tab
+- Replace icon-only zoom/data/expression conversion buttons with an explicit `fx` menu (`Expression…`, `Data stops`, `Zoom stops`)
 - _...Add new stuff here..._
 
 ### 🐞 Bug fixes
